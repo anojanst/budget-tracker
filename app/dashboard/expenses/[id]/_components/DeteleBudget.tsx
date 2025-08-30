@@ -47,7 +47,7 @@ function DeleteBudget(props: { budgetId: number }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="h-8"><Trash /> Delete</Button>
+                <Button variant="destructive" className="h-8"><Trash /></Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

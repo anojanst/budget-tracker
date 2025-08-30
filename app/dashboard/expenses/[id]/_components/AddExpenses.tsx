@@ -47,14 +47,12 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
 
     return (
         <div>
-            <div >
+            <div>
                 <h2 className='font-semibold'>Add New Budget</h2>
             </div>
             <div className='p-2 border rounded-lg mt-1'>
 
                 <div className='grid grid-cols-2 gap-2'>
-
-
                     <div className=' col-span-1'>
                         <Input placeholder='Title - Eg: Groceries' value={name!} className='h-8' onChange={(e) => setName(e.target.value)} />
                     </div>

@@ -47,7 +47,7 @@ function ExpensesScreen() {
   }
 
   return (
-    <div className='p-10'>
+    <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
       <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
         <h1 className='font-bold text-3xl'>My Expenses</h1>
       </div>

@@ -51,7 +51,7 @@ function CreateBudget(props: { refreshData: () => void, budget: Budget }) {
     return (
         <Dialog>
             <DialogTrigger>
-                <span className='bg-primary p-3 h-8 px-4 text-white flex gap-2 rounded-md text-sm items-center'><PenBox size={16} /> Edit</span>
+                <span className='bg-primary p-3 h-8 px-4 text-white flex gap-2 rounded-md text-sm items-center'><PenBox size={16} /></span>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>

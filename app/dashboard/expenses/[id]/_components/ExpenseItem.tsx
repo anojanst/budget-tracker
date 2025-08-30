@@ -14,24 +14,51 @@ import { deleteExpense } from '@/utils/expenseUtil'
 function ExpenseItem(props: { expense: Expense, refreshData: () => void }) {
     const { expense, refreshData } = props
     const { user } = useUser()
-    
+
     const triggerDelete = async (expenseId: number, date: string, amount: number) => {
         const result = await deleteExpense(expenseId, date, amount, user?.primaryEmailAddress?.emailAddress!)
-        
+
         refreshData()
         toast(`Expense has been deleted.`)
     }
-    
+
     return (
-        <div className='flex justify-between p-3 px-5 bg-slate-100 rounded-xl my-1'>
-            <div className='w-[40%] flex justify-start'>{expense.name}</div>
-            <div className='w-[20%] flex justify-end font-semibold'>${expense.amount}.00</div>
-            <div className='w-[20%] flex justify-center'>{expense.date}</div>
-            <div className='w-[15%] flex justify-center'><Badge variant="default" className='bg-primary font-light'>{expense.tagName}</Badge></div>
-            <div className='w-[5%] flex justify-end'>
-                <Button size="icon" className='h-6 w-6 bg-red-700 hover:bg-red-900' onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}>
-                    <Trash size={10} />
+        <div className="grid grid-cols-12 items-center gap-x-3 gap-y-1 rounded-xl bg-slate-100 p-3 my-1">
+            {/* Date — mobile top-left, desktop center column */}
+            <div className="col-span-7 text-sm text-muted-foreground md:order-3 md:col-span-2 md:text-center">
+                {expense.date}
+            </div>
+
+            {/* Tag — mobile top-right */}
+            <div className="col-span-3 justify-self-end md:order-4 md:col-span-2 md:text-center">
+                <Badge className="bg-primary text-primary-foreground font-medium px-2 py-0.5 text-xs whitespace-nowrap">
+                    {expense.tagName}
+                </Badge>
+            </div>
+
+            {/* Delete — mobile next to tag (far right) */}
+            <div className="col-span-2 flex justify-end md:order-5 md:col-span-1">
+                <Button
+                    size="icon"
+                    variant="destructive"
+                    className="h-7 w-12"
+                    aria-label={`Delete ${expense.name}`}
+                    onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
+                >
+                    <Trash className="h-3.5 w-3.5" />
                 </Button>
+            </div>
+
+            {/* Name — mobile second line left, desktop first */}
+            <div className="col-span-7 truncate md:order-1 md:col-span-5" title={expense.name}>
+                {expense.name}
+            </div>
+
+            {/* Amount — mobile second line right, desktop second */}
+            <div className="col-span-5 text-right font-semibold tabular-nums md:order-2 md:col-span-2">
+                {typeof expense.amount === "number"
+                    ? `$${expense.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                    : `$${expense.amount}.00`}
             </div>
         </div>
     )

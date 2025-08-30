@@ -111,9 +111,9 @@ function ExpensesPage() {
   }
 
   return (
-    <div className='p-10'>
+    <div className='mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8'>
       <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-3xl'>My Expenses - {budget?.name}</h1>
+        <h1 className='font-bold text-2xl'>{budget?.name}</h1>
         <div className='flex gap-2'>
           <EditBudget budget={budget!} refreshData={() => fetchData()} />
           <DeleteBudget budgetId={budget?.id!} />
@@ -121,8 +121,8 @@ function ExpensesPage() {
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 mt-2'>
         <div className='col-span-1 lg:col-span-2 grid'>
-          <div className='-mb-2'>
-            <h2 className='font-semibold'>Summary</h2>
+          <div>
+            <h2 className='font-semibold lg:-mb-3'>Summary</h2>
           </div>
           {budget ? <BudgetItem budget={budget} /> : <BudgetItemSkeleton />}
 

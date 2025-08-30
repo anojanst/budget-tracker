@@ -42,7 +42,7 @@ function IncomeScreen() {
         fetchIncomes(user?.primaryEmailAddress?.emailAddress!);
     }, [user]);
     return (
-        <div className='p-10'>
+        <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
             <div className='flex justify-between pb-3'>
                 <h1 className='font-bold text-3xl'>My Incomes</h1>
             </div>
@@ -54,15 +54,6 @@ function IncomeScreen() {
                 </div>
                 <div className='col-span-1 md:col-span-2 border rounded-lg p-3'>
                     <h2 className='font-semibold'>Latest Income</h2>
-                    <div className='flex justify-between p-3 px-5 bg-slate-300 rounded-xl my-1'>
-                        <div className='w-[35%] flex justify-start font-semibold'>Source Name</div>
-                        <div className='w-[15%] flex justify-end font-semibold'>Amount</div>
-                        <div className='w-[15%] flex justify-end font-semibold'>Category</div>
-                        <div className='w-[15%] flex justify-end font-semibold'>Date</div>
-                        <div className='w-[10%] flex justify-end font-semibold'>
-                            Delete
-                        </div>
-                    </div>
                     {incomes.length > 0 ? incomes.map((income, index) => (
                         <IncomeItem key={index} income={income} refreshData={() => fetchIncomes(user?.primaryEmailAddress?.emailAddress!)} />
                     )) : <Skeleton className='h-10 w-full' />}
