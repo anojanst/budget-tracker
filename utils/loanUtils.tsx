@@ -386,13 +386,35 @@ export const addExtraLoanPayment = async (
 
 
 export const deleteLoan = async (loanId: number, createdBy: string) => {
-  const allRepayments = await db.select({ id: LoanRepayments.id, expenseId: LoanRepayments.expenseId, scheduledDate: LoanRepayments.scheduledDate, amount: LoanRepayments.amount }).from(LoanRepayments).where(eq(LoanRepayments.loanId, loanId))
+  // Get all repayments with their expense info before deleting
+  const allRepayments = await db.select({ 
+    id: LoanRepayments.id, 
+    expenseId: LoanRepayments.expenseId, 
+    scheduledDate: LoanRepayments.scheduledDate, 
+    amount: LoanRepayments.amount 
+  }).from(LoanRepayments).where(eq(LoanRepayments.loanId, loanId))
+  
+  // Store expense info before deleting loan repayments
+  const expensesToDelete: Array<{ id: number; date: string; amount: number }> = []
   for (let i = 0; i < allRepayments.length; i++) {
     if (allRepayments[i].expenseId !== null) {
-      await deleteExpense(allRepayments[i].expenseId!, allRepayments[i].scheduledDate, allRepayments[i].amount, createdBy)
-      await deleteLoanRepayment(allRepayments[i].id, createdBy)
+      expensesToDelete.push({
+        id: allRepayments[i].expenseId!,
+        date: allRepayments[i].scheduledDate,
+        amount: allRepayments[i].amount
+      })
     }
   }
+  
+  // First, delete all loan repayments (this removes the foreign key constraint)
+  await db.delete(LoanRepayments).where(eq(LoanRepayments.loanId, loanId))
+  
+  // Then, delete all associated expenses
+  for (const expense of expensesToDelete) {
+    await deleteExpense(expense.id, expense.date, expense.amount, createdBy)
+  }
+  
+  // Finally, delete the loan
   const result = await db.delete(Loans).where(eq(Loans.id, loanId)).returning()
 }
 

@@ -1,5 +1,6 @@
 import exp from "constants";
 import { integer, pgTable, serial, varchar, date, pgEnum, numeric, primaryKey, uniqueIndex, boolean } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import next from "next";
 
 export const Budgets = pgTable("budgets", {
@@ -83,6 +84,42 @@ export const LoanRepayments = pgTable("loan_repayments", {
   interestAmount: integer("interest_amount").notNull(),
   status: varchar("status").notNull().default("pending"),
   expenseId: integer("expense_id").references(() => Expenses.id),
+});
+
+export const shoppingPlanStatusEnum = pgEnum("shopping_plan_status", [
+  "draft",
+  "ready",
+  "shopping",
+  "post_shopping",
+  "completed"
+]);
+
+export const needWantEnum = pgEnum("need_want", [
+  "need",
+  "want"
+]);
+
+export const ShoppingPlans = pgTable("shopping_plans", {
+  id: serial("id").primaryKey(),
+  createdBy: varchar("created_by").notNull(),
+  planDate: date("plan_date").notNull(),
+  status: shoppingPlanStatusEnum("status").notNull().default("draft"),
+  createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
+});
+
+export const ShoppingItems = pgTable("shopping_items", {
+  id: serial("id").primaryKey(),
+  planId: integer("plan_id").references(() => ShoppingPlans.id),
+  name: varchar("name").notNull(),
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull(),
+  uom: varchar("uom"), // unit of measure (optional)
+  needWant: needWantEnum("need_want").notNull(),
+  estimatePrice: integer("estimate_price").notNull(),
+  actualPrice: numeric("actual_price", { precision: 10, scale: 2 }),
+  isPurchased: boolean("is_purchased").notNull().default(false),
+  isMovedToNext: boolean("is_moved_to_next").notNull().default(false),
+  isOutOfPlan: boolean("is_out_of_plan").notNull().default(false),
+  createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
 });
 
 

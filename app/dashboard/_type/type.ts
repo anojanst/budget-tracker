@@ -61,4 +61,35 @@ export interface Loan {
     interestAmount: number;
     status: string;
   }
+
+  export interface ShoppingPlan {
+    id: number;
+    createdBy: string;
+    planDate: string; // Format: YYYY-MM-DD
+    status: "draft" | "ready" | "shopping" | "post_shopping" | "completed";
+    createdAt: string;
+  }
+
+  export interface ShoppingItem {
+    id: number;
+    planId: number | null;
+    name: string;
+    quantity: number;
+    uom: string | null; // unit of measure
+    needWant: "need" | "want";
+    estimatePrice: number;
+    actualPrice: number | null;
+    isPurchased: boolean;
+    isMovedToNext: boolean;
+    isOutOfPlan: boolean;
+    createdAt: string;
+  }
+
+  export interface ShoppingPlanWithItems extends ShoppingPlan {
+    items: ShoppingItem[];
+    totalEstimate: number;
+    totalActual: number;
+    verdict?: "under_budget" | "on_budget" | "over_budget";
+    planNumber?: number;
+  }
   
