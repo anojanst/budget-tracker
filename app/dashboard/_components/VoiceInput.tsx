@@ -22,6 +22,8 @@ export interface ParsedVoiceData {
 function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
+  const [parsedData, setParsedData] = useState<ParsedVoiceData | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [isSupported, setIsSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
@@ -53,16 +55,21 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
       recognition.onstart = () => {
         setIsListening(true)
         setTranscript('')
+        setParsedData(null)
+        setError(null)
         toast.info('Listening... Speak now')
       }
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcriptText = event.results[0][0].transcript
         setTranscript(transcriptText)
+        setError(null)
         onTranscript(transcriptText)
         
         // Parse the transcript
         const parsed = parseVoiceInput(transcriptText, type)
+        setParsedData(parsed)
+        
         if (onParse) {
           onParse(parsed)
         }
@@ -73,15 +80,18 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
       recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error)
         setIsListening(false)
+        const errorMessage = `Error: ${event.error}${event.message ? ` - ${event.message}` : ''}`
+        setError(errorMessage)
+        
         if (event.error === 'no-speech') {
           toast.error('No speech detected. Please try again.')
         } else if (event.error === 'not-allowed') {
-          toast.error(
-            'Microphone permission denied. Please click the microphone icon in your browser\'s address bar and allow access, or check your browser settings.',
-            { duration: 5000 }
-          )
+          const msg = 'Microphone permission denied. Please click the microphone icon in your browser\'s address bar and allow access, or check your browser settings.'
+          setError(msg)
+          toast.error(msg, { duration: 5000 })
         } else if (event.error === 'aborted') {
           // User stopped it, no need to show error
+          setError(null)
         } else {
           toast.error(`Speech recognition error: ${event.error}. Please try again.`)
         }
@@ -105,24 +115,31 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
 
   const startListening = async () => {
     if (typeof window === 'undefined' || !navigator.mediaDevices) {
-      toast.error('Voice input is not available in this environment.')
+      const msg = 'Voice input is not available in this environment.'
+      setError(msg)
+      toast.error(msg)
       return
     }
 
     if (recognitionRef.current && !isListening) {
       try {
+        setError(null)
         // Request microphone permission first
         try {
           await navigator.mediaDevices.getUserMedia({ audio: true })
         } catch (permissionError: any) {
+          const errorMsg = `Permission Error: ${permissionError.name} - ${permissionError.message || 'Microphone access denied'}`
+          setError(errorMsg)
+          
           if (permissionError.name === 'NotAllowedError' || permissionError.name === 'PermissionDeniedError') {
-            toast.error(
-              'Microphone permission is required. Please:\n1. Click the lock/microphone icon in your browser address bar\n2. Allow microphone access\n3. Refresh the page and try again',
-              { duration: 6000 }
-            )
+            const msg = 'Microphone permission is required. Please:\n1. Click the lock/microphone icon in your browser address bar\n2. Allow microphone access\n3. Refresh the page and try again'
+            setError(msg)
+            toast.error(msg, { duration: 6000 })
             return
           } else if (permissionError.name === 'NotFoundError') {
-            toast.error('No microphone found. Please connect a microphone and try again.')
+            const msg = 'No microphone found. Please connect a microphone and try again.'
+            setError(msg)
+            toast.error(msg)
             return
           }
         }
@@ -130,11 +147,13 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         recognitionRef.current.start()
       } catch (error: any) {
         console.error('Error starting recognition:', error)
+        const errorMsg = `Start Error: ${error.name || 'Unknown'} - ${error.message || 'Failed to start voice recognition'}`
+        setError(errorMsg)
+        
         if (error.name === 'NotAllowedError' || error.message?.includes('not-allowed')) {
-          toast.error(
-            'Microphone permission denied. Please allow microphone access in your browser settings and try again.',
-            { duration: 5000 }
-          )
+          const msg = 'Microphone permission denied. Please allow microphone access in your browser settings and try again.'
+          setError(msg)
+          toast.error(msg, { duration: 5000 })
         } else {
           toast.error('Failed to start voice recognition. Please try again.')
         }
@@ -272,7 +291,7 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   }
 
   return (
-    <div className='flex flex-col gap-2'>
+    <div className='flex flex-col gap-2 p-3 border rounded-lg bg-slate-50'>
       <div className='flex items-center gap-2'>
         <Button
           type='button'
@@ -293,16 +312,54 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
             </>
           )}
         </Button>
-        {transcript && (
-          <Badge variant='outline' className='text-xs max-w-xs truncate'>
-            {transcript}
-          </Badge>
+        {isListening && (
+          <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+            <div className='w-2 h-2 bg-red-500 rounded-full animate-pulse' />
+            <span>Listening...</span>
+          </div>
         )}
       </div>
-      {isListening && (
-        <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-          <div className='w-2 h-2 bg-red-500 rounded-full animate-pulse' />
-          <span>Listening...</span>
+
+      {/* Transcript Display */}
+      {transcript && (
+        <div className='mt-2 p-2 bg-white border rounded text-sm'>
+          <div className='font-semibold text-xs text-muted-foreground mb-1'>Transcript:</div>
+          <div className='text-sm'>{transcript}</div>
+        </div>
+      )}
+
+      {/* Parsed Data Display */}
+      {parsedData && (
+        <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm'>
+          <div className='font-semibold text-xs text-blue-700 mb-2'>Parsed Data:</div>
+          <div className='space-y-1 text-xs'>
+            {parsedData.name && (
+              <div><span className='font-medium'>Name:</span> {parsedData.name}</div>
+            )}
+            {parsedData.amount && (
+              <div><span className='font-medium'>Amount:</span> ${parsedData.amount}</div>
+            )}
+            {parsedData.date && (
+              <div><span className='font-medium'>Date:</span> {parsedData.date}</div>
+            )}
+            {parsedData.tag && (
+              <div><span className='font-medium'>Tag:</span> {parsedData.tag}</div>
+            )}
+            {parsedData.category && (
+              <div><span className='font-medium'>Category:</span> {parsedData.category}</div>
+            )}
+            {!parsedData.name && !parsedData.amount && !parsedData.date && !parsedData.tag && !parsedData.category && (
+              <div className='text-muted-foreground italic'>No data extracted from transcript</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className='mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm'>
+          <div className='font-semibold text-xs text-red-700 mb-1'>Error:</div>
+          <div className='text-xs text-red-600 whitespace-pre-wrap'>{error}</div>
         </div>
       )}
     </div>

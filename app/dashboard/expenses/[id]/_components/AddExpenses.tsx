@@ -26,6 +26,8 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
     const [tagId, setTagId] = useState<number | null>(null)
 
     const handleVoiceParse = (parsed: ParsedVoiceData) => {
+        console.log('Voice parsed data:', parsed)
+        
         if (parsed.name) {
             setName(parsed.name)
         }
@@ -43,28 +45,56 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
             )
             if (matchingTag) {
                 setTagId(matchingTag.id)
+                console.log('Matched tag:', matchingTag)
+            } else {
+                console.log('No matching tag found for:', parsed.tag)
             }
         }
+        
+        // Log what was set
+        console.log('Form state after voice parse:', {
+            name: parsed.name || name,
+            amount: parsed.amount || amount,
+            date: parsed.date || date,
+            tagId: parsed.tag ? tags.find(t => 
+                t.name.toLowerCase().includes(parsed.tag!.toLowerCase()) ||
+                parsed.tag!.toLowerCase().includes(t.name.toLowerCase())
+            )?.id : tagId
+        })
     }
 
     const saveExpense = async () => {
-        const result = await db.insert(Expenses).values({
-            name: name,
-            amount: amount,
-            createdBy: user?.primaryEmailAddress?.emailAddress!,
-            date: date,
-            tagId: tagId
+        console.log('Saving expense with data:', { name, amount, date, tagId, createdBy: user?.primaryEmailAddress?.emailAddress })
+        
+        if (!name || !amount || !date || !tagId) {
+            console.error('Missing required fields:', { name, amount, date, tagId })
+            toast.error('Please fill in all required fields')
+            return
+        }
 
-        }).returning({ insertedId: Expenses.id })
+        try {
+            const result = await db.insert(Expenses).values({
+                name: name,
+                amount: amount,
+                createdBy: user?.primaryEmailAddress?.emailAddress!,
+                date: date,
+                tagId: tagId
+            }).returning({ insertedId: Expenses.id })
 
-        if (result) {
-            recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amount, "expense", "add");
-            refreshData()
-            toast(`Expense has been created. Budget Id is: ${result[0].insertedId!} `)
-            setAmount(0)
-            setName('')
-            setDate(format(new Date(), 'yyyy-MM-dd'))
-            setTagId(null)
+            console.log('Expense saved successfully:', result)
+
+            if (result) {
+                recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amount, "expense", "add");
+                refreshData()
+                toast(`Expense has been created. Budget Id is: ${result[0].insertedId!} `)
+                setAmount(0)
+                setName('')
+                setDate(format(new Date(), 'yyyy-MM-dd'))
+                setTagId(null)
+            }
+        } catch (error) {
+            console.error('Error saving expense:', error)
+            toast.error(`Failed to save expense: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
     }
 
