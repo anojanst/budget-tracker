@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Wallet,
   ShoppingCart,
+  Target,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -45,8 +46,9 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       { id: 4, name: "Incomes", icon: Wallet, path: "/dashboard/incomes" },
       { id: 5, name: "Loans", icon: Landmark, path: "/dashboard/loans" },
       { id: 6, name: "Shopping Planner", icon: ShoppingCart, path: "/dashboard/shopping-planner" },
-      { id: 7, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
-      { id: 8, name: "Toolkits", icon: PocketKnife, path: "/dashboard/toolkits" },
+      { id: 7, name: "Saving Goals", icon: Target, path: "/dashboard/saving-goals" },
+      { id: 8, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
+      { id: 9, name: "Toolkits", icon: PocketKnife, path: "/dashboard/toolkits" },
     ],
     []
   );

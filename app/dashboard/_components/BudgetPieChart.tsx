@@ -13,10 +13,11 @@ const BudgetPieChart = () => {
   const [data, setData] = useState<{ name: string; totalSpent: number }[]>([]);
 
   const getBudgetSpending = async (createdBy: string) => {
-    const data = await db
+    // Get budget spending
+    const budgetData = await db
       .select({
         name: Budgets.name,
-        totalSpent: sql<number>`SUM(${Expenses.amount})`.as("totalSpent"),
+        totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("totalSpent"),
       })
       .from(Budgets)
       .leftJoin(Tags, sql`${Tags.budgetId} = ${Budgets.id}`)
@@ -24,13 +25,33 @@ const BudgetPieChart = () => {
       .where(eq(Expenses.createdBy, createdBy))
       .groupBy(Budgets.name);
   
-    
-      const cleanedData = data.map((item) => ({
+    // Get savings total (contributions are recorded as expenses with "Savings:" prefix)
+    const savingsData = await db
+      .select({
+        totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("totalSpent"),
+      })
+      .from(Expenses)
+      .where(
+        sql`${Expenses.createdBy} = ${createdBy} AND ${Expenses.name} LIKE 'Savings:%'`
+      );
+
+    const cleanedData = budgetData
+      .map((item) => ({
         name: item.name || "Uncategorized",
         totalSpent: Number(item.totalSpent),
-      }));
+      }))
+      .filter((item) => item.totalSpent > 0);
 
-      console.log(cleanedData);
+    // Add savings if there are any
+    const savingsTotal = Number(savingsData[0]?.totalSpent || 0);
+    if (savingsTotal > 0) {
+      cleanedData.push({
+        name: "Savings",
+        totalSpent: savingsTotal,
+      });
+    }
+
+    console.log(cleanedData);
     return cleanedData;
   };
 

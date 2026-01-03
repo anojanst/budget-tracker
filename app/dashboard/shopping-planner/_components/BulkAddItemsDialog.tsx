@@ -91,7 +91,7 @@ function BulkAddItemsDialog({
           db.insert(ShoppingItems).values({
             planId: planId,
             name: item.name,
-            quantity: parseFloat(item.quantity),
+            quantity: item.quantity, // numeric type expects string
             uom: item.uom || null,
             needWant: item.needWant,
             estimatePrice: parseInt(item.estimatePrice),

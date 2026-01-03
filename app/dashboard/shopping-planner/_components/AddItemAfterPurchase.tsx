@@ -61,11 +61,11 @@ function AddItemAfterPurchase({
       await db.insert(ShoppingItems).values({
         planId: planId,
         name: toTitleCase(name.trim()),
-        quantity: parseFloat(quantity),
+        quantity: quantity, // numeric type expects string
         uom: uom || null,
         needWant: needWant,
         estimatePrice: Math.round(parseFloat(actualPrice)), // Use actual price as estimate for unplanned items (round to integer)
-        actualPrice: parseFloat(actualPrice),
+        actualPrice: actualPrice, // numeric type expects string
         isPurchased: true,
         isMovedToNext: false,
         isOutOfPlan: true,

@@ -122,4 +122,23 @@ export const ShoppingItems = pgTable("shopping_items", {
   createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
 });
 
+export const SavingGoals = pgTable("saving_goals", {
+  id: serial("id").primaryKey(),
+  createdBy: varchar("created_by").notNull(),
+  title: varchar("title").notNull(),
+  targetAmount: integer("target_amount").notNull(),
+  targetDate: date("target_date").notNull(),
+  createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
+});
+
+export const SavingContributions = pgTable("saving_contributions", {
+  id: serial("id").primaryKey(),
+  goalId: integer("goal_id").references(() => SavingGoals.id),
+  createdBy: varchar("created_by").notNull(),
+  amount: integer("amount").notNull(),
+  date: date("date").notNull(),
+  expenseId: integer("expense_id").references(() => Expenses.id),
+  createdAt: date("created_at").notNull().default(sql`CURRENT_DATE`),
+});
+
 

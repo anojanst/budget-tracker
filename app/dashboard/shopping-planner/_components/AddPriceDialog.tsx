@@ -42,7 +42,7 @@ function AddPriceDialog({
       await db
         .update(ShoppingItems)
         .set({
-          actualPrice: parseFloat(actualPrice),
+          actualPrice: actualPrice, // numeric type expects string
         })
         .where(eq(ShoppingItems.id, item.id))
 

@@ -37,7 +37,7 @@ function PurchaseItemDialog({
       await db
         .update(ShoppingItems)
         .set({
-          actualPrice: actualPrice ? parseFloat(actualPrice) : null,
+          actualPrice: actualPrice || null, // numeric type expects string
           isPurchased: true,
         })
         .where(eq(ShoppingItems.id, item.id))

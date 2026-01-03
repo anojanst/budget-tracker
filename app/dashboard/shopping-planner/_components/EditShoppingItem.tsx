@@ -58,7 +58,7 @@ function EditShoppingItem({
         .update(ShoppingItems)
         .set({
           name: toTitleCase(name.trim()),
-          quantity: parseFloat(quantity),
+          quantity: quantity, // numeric type expects string
           uom: uom || null,
           needWant: needWant,
           estimatePrice: parseInt(estimatePrice),

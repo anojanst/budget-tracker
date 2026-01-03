@@ -92,4 +92,30 @@ export interface Loan {
     verdict?: "under_budget" | "on_budget" | "over_budget";
     planNumber?: number;
   }
+
+  export interface SavingGoal {
+    id: number;
+    createdBy: string;
+    title: string;
+    targetAmount: number;
+    targetDate: string; // Format: YYYY-MM-DD
+    createdAt: string;
+  }
+
+  export interface SavingContribution {
+    id: number;
+    goalId: number | null;
+    createdBy: string;
+    amount: number;
+    date: string; // Format: YYYY-MM-DD
+    expenseId: number | null;
+    createdAt: string;
+  }
+
+  export interface SavingGoalWithContributions extends SavingGoal {
+    contributions: SavingContribution[];
+    totalSaved: number;
+    progress: number; // percentage
+    remainingAmount: number;
+  }
   

@@ -54,7 +54,7 @@ function AddShoppingItem({
       await db.insert(ShoppingItems).values({
         planId: planId,
         name: toTitleCase(name.trim()),
-        quantity: parseFloat(quantity),
+        quantity: quantity, // numeric type expects string
         uom: finalUom || null,
         needWant: needWant,
         estimatePrice: parseInt(estimatePrice),

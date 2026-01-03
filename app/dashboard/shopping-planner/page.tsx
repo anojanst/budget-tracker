@@ -44,7 +44,7 @@ function ShoppingPlannerPage() {
         .orderBy(desc(ShoppingPlans.id))
 
       // Group plans by date and calculate plan numbers
-      const plansByDate = new Map<string, ShoppingPlans[]>()
+      const plansByDate = new Map<string, typeof currentPlans[0][]>()
       currentPlans.forEach(plan => {
         const dateKey = plan.planDate
         if (!plansByDate.has(dateKey)) {

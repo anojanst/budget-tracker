@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import BudgetSummary from './_components/BudgetSummary'
 import BudgetPieChart from './_components/BudgetPieChart'
 import BudgetComparisonChart from './_components/BudgetComparisonChart'
+import SavingGoalsSummary from './_components/SavingGoalsSummary'
 import { db } from '@/utils/dbConfig'
 import { Budgets, Tags, Expenses, LoanRepayments } from '@/utils/schema'
 import { eq, sql, gte, lte, and } from 'drizzle-orm'
@@ -107,6 +108,7 @@ function Dashboard() {
           total_budget_amount={total_budget_amount}
           total_expense_count={total_expense_count}
         />
+        <SavingGoalsSummary />
       </div>
 
       {total_expense_count > 0 ? (

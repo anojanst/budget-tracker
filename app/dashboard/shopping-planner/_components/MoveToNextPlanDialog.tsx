@@ -116,7 +116,7 @@ function MoveToNextPlanDialog({
       await db.insert(ShoppingItems).values({
         planId: nextPlanId,
         name: toTitleCase(item.name.trim()),
-        quantity: item.quantity,
+        quantity: item.quantity.toString(), // numeric type expects string
         uom: item.uom || null,
         needWant: item.needWant,
         estimatePrice: item.estimatePrice,

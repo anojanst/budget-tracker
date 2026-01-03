@@ -55,7 +55,7 @@ function BulkAddPricesDialog({
         .filter(([_, price]) => price && price.trim() !== '')
         .map(([itemId, price]) => ({
           id: parseInt(itemId),
-          price: parseFloat(price)
+          price: price // numeric type expects string
         }))
 
       if (updates.length === 0) {
