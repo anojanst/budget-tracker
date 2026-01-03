@@ -17,8 +17,8 @@ import { useState } from 'react';
 import { recalcBalanceHistoryFromDate } from '@/utils/recalcBalanceHistoryFromDate';
 import VoiceInput, { ParsedVoiceData } from '@/app/dashboard/_components/VoiceInput';
 
-function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
-    const { refreshData, tags } = props
+function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: number }) {
+    const { refreshData, tags, budgetId } = props
     const { user } = useUser()
     const [name, setName] = useState('')
     const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
@@ -78,6 +78,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
                 amount: amount,
                 createdBy: user?.primaryEmailAddress?.emailAddress!,
                 date: date,
+                budgetId: budgetId,
                 tagId: tagId
             }).returning({ insertedId: Expenses.id })
 
@@ -86,7 +87,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
             if (result) {
                 recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amount, "expense", "add");
                 refreshData()
-                toast(`Expense has been created. Budget Id is: ${result[0].insertedId!} `)
+                toast(`Expense has been created.`)
                 setAmount(0)
                 setName('')
                 setDate(format(new Date(), 'yyyy-MM-dd'))

@@ -8,6 +8,7 @@ export const addExpense = async (
   name: string,
   amount: number,
   date: string,
+  budgetId: number | null,
   tagId: number | null
 ) => {
   try {
@@ -20,6 +21,7 @@ export const addExpense = async (
           name,
           amount,
           date,
+          budgetId: budgetId,
           tagId: tagId
         })
         .returning({ id: Expenses.id });

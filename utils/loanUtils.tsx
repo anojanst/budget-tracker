@@ -244,6 +244,7 @@ export const createExpenseEntryForLoan = async (
     name: `Loan Repayment - ${loan.lender}`,
     amount: loan.EMI,
     date: loanRepayment.scheduledDate,
+    budgetId: null,
     tagId: null,
   }).returning({ id: Expenses.id });
 
@@ -321,6 +322,7 @@ export const addExtraLoanPayment = async (
       name: `Loan Repayment - ${currentLoan.lender}`,
       amount: Math.round(extraAmount + fee),
       date: paymentDate,
+      budgetId: null,
       tagId: null,
     }).returning({ id: Expenses.id });
 

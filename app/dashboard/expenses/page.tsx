@@ -1,7 +1,7 @@
 'use client'
 import { Budgets, Expenses, Tags } from '@/utils/schema'
 import { useEffect, useState } from 'react'
-import { eq, and, asc } from 'drizzle-orm'
+import { eq, and, asc, sql } from 'drizzle-orm'
 import { db } from '@/utils/dbConfig'
 import { useUser } from '@clerk/nextjs'
 import { Expense } from '../_type/type'
@@ -23,6 +23,7 @@ function ExpensesScreen() {
 
   const getExpenses = async ( userEmail: string) => {
     try {
+      // Get all expenses with their budget and tag info
       const expenses = await db
         .select({
           id: Expenses.id,
@@ -30,13 +31,15 @@ function ExpensesScreen() {
           amount: Expenses.amount,
           createdBy: Expenses.createdBy,
           date: Expenses.date,
+          budgetId: Expenses.budgetId,
           tagId: Expenses.tagId,
           tagName: Tags.name,
+          budgetName: Budgets.name,
         })
         .from(Expenses)
-        .innerJoin(Tags, eq(Expenses.tagId, Tags.id))
-        .innerJoin(Budgets, eq(Tags.budgetId, Budgets.id))
-        .where(and(eq(Expenses.createdBy, userEmail)))
+        .leftJoin(Tags, eq(Expenses.tagId, Tags.id))
+        .leftJoin(Budgets, eq(Expenses.budgetId, Budgets.id))
+        .where(eq(Expenses.createdBy, userEmail))
         .orderBy(asc(Expenses.date));
 
       return expenses;

@@ -13,15 +13,14 @@ const BudgetPieChart = () => {
   const [data, setData] = useState<{ name: string; totalSpent: number }[]>([]);
 
   const getBudgetSpending = async (createdBy: string) => {
-    // Get budget spending
+    // Get budget spending using budgetId directly
     const budgetData = await db
       .select({
         name: Budgets.name,
         totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("totalSpent"),
       })
       .from(Budgets)
-      .leftJoin(Tags, sql`${Tags.budgetId} = ${Budgets.id}`)
-      .leftJoin(Expenses, sql`${Expenses.tagId} = ${Tags.id}`)
+      .leftJoin(Expenses, sql`${Expenses.budgetId} = ${Budgets.id}`)
       .where(eq(Expenses.createdBy, createdBy))
       .groupBy(Budgets.name);
   

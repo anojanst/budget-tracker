@@ -31,9 +31,15 @@ function ExpenseItem(props: { expense: Expense, refreshData: () => void }) {
 
             {/* Tag — mobile top-right */}
             <div className="col-span-3 justify-self-end md:order-4 md:col-span-2 md:text-center">
-                <Badge className="bg-primary text-primary-foreground font-medium px-2 py-0.5 text-xs whitespace-nowrap">
-                    {expense.tagName}
-                </Badge>
+                {expense.tagName ? (
+                    <Badge className="bg-primary text-primary-foreground font-medium px-2 py-0.5 text-xs whitespace-nowrap">
+                        {expense.tagName}
+                    </Badge>
+                ) : (
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 font-medium px-2 py-0.5 text-xs whitespace-nowrap">
+                        No Tag
+                    </Badge>
+                )}
             </div>
 
             {/* Delete — mobile next to tag (far right) */}

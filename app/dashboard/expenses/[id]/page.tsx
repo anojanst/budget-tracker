@@ -52,7 +52,7 @@ function ExpensesPage() {
         })
         .from(Budgets)
         .leftJoin(Tags, eq(Tags.budgetId, Budgets.id))
-        .leftJoin(Expenses, eq(Expenses.tagId, Tags.id))
+        .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
         .where(and(eq(Budgets.createdBy, userEmail), eq(Budgets.id, id)))
         .groupBy(Budgets.id);
 
@@ -87,6 +87,7 @@ function ExpensesPage() {
 
   const getExpensesByBudget = async (budgetId: number, userEmail: string) => {
     try {
+      // Get expenses that belong to this budget (using budgetId directly)
       const expenses = await db
         .select({
           id: Expenses.id,
@@ -94,13 +95,15 @@ function ExpensesPage() {
           amount: Expenses.amount,
           createdBy: Expenses.createdBy,
           date: Expenses.date,
+          budgetId: Expenses.budgetId,
           tagId: Expenses.tagId,
           tagName: Tags.name,
+          budgetName: Budgets.name,
         })
         .from(Expenses)
-        .innerJoin(Tags, eq(Expenses.tagId, Tags.id))
-        .innerJoin(Budgets, eq(Tags.budgetId, Budgets.id))
-        .where(and(eq(Budgets.id, budgetId), eq(Expenses.createdBy, userEmail)))
+        .leftJoin(Tags, eq(Expenses.tagId, Tags.id))
+        .leftJoin(Budgets, eq(Expenses.budgetId, Budgets.id))
+        .where(and(eq(Expenses.budgetId, budgetId), eq(Expenses.createdBy, userEmail)))
         .orderBy(Expenses.date);
 
       return expenses;
@@ -128,7 +131,7 @@ function ExpensesPage() {
 
         </div>
         <div className='col-span-1 lg:col-span-3'>
-          {budget ? <AddExpenses refreshData={() => fetchData()} tags={tags ? tags : []} /> : <Skeleton className='h-40 w-full' />}
+          {budget ? <AddExpenses refreshData={() => fetchData()} tags={tags ? tags : []} budgetId={budgetId} /> : <Skeleton className='h-40 w-full' />}
         </div>
         <div className='col-span-1 lg:col-span-2'>
           {budget ? <AddTags refreshData={() => fetchData()} budgetId={budget?.id!} /> : <Skeleton className='h-40 w-full' />}

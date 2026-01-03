@@ -23,8 +23,10 @@ export interface Expense {
     amount: number,
     createdBy: string,
     date: string,
+    budgetId: number | null,
     tagId: number | null,
-    tagName: string
+    tagName: string | null,
+    budgetName: string | null
 }
 
 export interface Income {

@@ -67,6 +67,7 @@ function AddContribution({
           name: `Savings: ${goalTitle}`,
           amount: contributionAmount,
           date: date,
+          budgetId: null, // No budget for savings
           tagId: null, // No tag for savings
         })
         .returning({ id: Expenses.id })
