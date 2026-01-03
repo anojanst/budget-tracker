@@ -66,9 +66,9 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
     const saveExpense = async () => {
         console.log('Saving expense with data:', { name, amount, date, tagId, createdBy: user?.primaryEmailAddress?.emailAddress })
         
-        if (!name || !amount || !date || !tagId) {
-            console.error('Missing required fields:', { name, amount, date, tagId })
-            toast.error('Please fill in all required fields')
+        if (!name || !amount || !date) {
+            console.error('Missing required fields:', { name, amount, date })
+            toast.error('Please fill in name, amount, and date')
             return
         }
 
@@ -139,7 +139,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
                     <div className='mt-1 col-span-2'>
 
                         <Button
-                            disabled={!(name && amount && date && tagId)}
+                            disabled={!(name && amount && date)}
                             onClick={() => saveExpense()}
                             className='w-full h-8'>Save Expense</Button>
                     </div>
