@@ -15,6 +15,7 @@ import { Tag } from '@/app/dashboard/_type/type';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useState } from 'react';
 import { recalcBalanceHistoryFromDate } from '@/utils/recalcBalanceHistoryFromDate';
+import VoiceInput, { ParsedVoiceData } from '@/app/dashboard/_components/VoiceInput';
 
 function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
     const { refreshData, tags } = props
@@ -23,6 +24,28 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
     const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
     const [amount, setAmount] = useState(0)
     const [tagId, setTagId] = useState<number | null>(null)
+
+    const handleVoiceParse = (parsed: ParsedVoiceData) => {
+        if (parsed.name) {
+            setName(parsed.name)
+        }
+        if (parsed.amount) {
+            setAmount(parsed.amount)
+        }
+        if (parsed.date) {
+            setDate(parsed.date)
+        }
+        if (parsed.tag) {
+            // Try to find matching tag
+            const matchingTag = tags.find(tag => 
+                tag.name.toLowerCase().includes(parsed.tag!.toLowerCase()) ||
+                parsed.tag!.toLowerCase().includes(tag.name.toLowerCase())
+            )
+            if (matchingTag) {
+                setTagId(matchingTag.id)
+            }
+        }
+    }
 
     const saveExpense = async () => {
         const result = await db.insert(Expenses).values({
@@ -51,7 +74,13 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[] }) {
                 <h2 className='font-semibold'>Add New Budget</h2>
             </div>
             <div className='p-2 border rounded-lg mt-1'>
-
+                <div className='mb-2'>
+                    <VoiceInput 
+                        type='expense' 
+                        onTranscript={() => {}} 
+                        onParse={handleVoiceParse}
+                    />
+                </div>
                 <div className='grid grid-cols-2 gap-2'>
                     <div className=' col-span-1'>
                         <Input placeholder='Title - Eg: Groceries' value={name!} className='h-8' onChange={(e) => setName(e.target.value)} />

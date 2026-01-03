@@ -9,6 +9,7 @@ import { useUser } from '@clerk/nextjs';
 import { toast } from 'sonner';
 import { format } from "date-fns";
 import { recalcBalanceHistoryFromDate } from "@/utils/recalcBalanceHistoryFromDate";
+import VoiceInput, { ParsedVoiceData } from '@/app/dashboard/_components/VoiceInput';
 
 function AddIncome(props: { refreshData: () => void }) {
     const { refreshData } = props;
@@ -17,6 +18,21 @@ function AddIncome(props: { refreshData: () => void }) {
     const [amount, setAmount] = useState(0);
     const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
     const [category, setCategory] = useState<string>("Salary"); // Default category
+
+    const handleVoiceParse = (parsed: ParsedVoiceData) => {
+        if (parsed.name) {
+            setName(parsed.name)
+        }
+        if (parsed.amount) {
+            setAmount(parsed.amount)
+        }
+        if (parsed.date) {
+            setDate(parsed.date)
+        }
+        if (parsed.category) {
+            setCategory(parsed.category)
+        }
+    }
 
     const saveIncome = async () => {
         const result = await db.insert(Incomes).values({
@@ -41,7 +57,14 @@ function AddIncome(props: { refreshData: () => void }) {
     return (
         <div>
             <div className='p-3 border rounded-lg'>
-                <h2 className='font-semibold mb-4'>Add New Income</h2>
+                <div className='flex items-center justify-between mb-4'>
+                    <h2 className='font-semibold'>Add New Income</h2>
+                    <VoiceInput 
+                        type='income' 
+                        onTranscript={() => {}} 
+                        onParse={handleVoiceParse}
+                    />
+                </div>
                 <div className='grid grid-cols-1 gap-2'>
                     <div className='col-span-1'>
                         <h1 className='text-sm font-semibold'>Source Name</h1>
