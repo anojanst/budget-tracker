@@ -26,6 +26,11 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   const recognitionRef = useRef<SpeechRecognition | null>(null)
 
   useEffect(() => {
+    // Only run in browser environment
+    if (typeof window === 'undefined') {
+      return
+    }
+
     // Check if browser supports Speech Recognition
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -99,6 +104,11 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   }, [onTranscript, onParse, type])
 
   const startListening = async () => {
+    if (typeof window === 'undefined' || !navigator.mediaDevices) {
+      toast.error('Voice input is not available in this environment.')
+      return
+    }
+
     if (recognitionRef.current && !isListening) {
       try {
         // Request microphone permission first
@@ -252,7 +262,7 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
     return (
       <div className='text-xs text-muted-foreground'>
         Voice input not supported in this browser. Please use Chrome, Edge, or Safari.
-        {!window.isSecureContext && window.location.hostname !== 'localhost' && (
+        {typeof window !== 'undefined' && !window.isSecureContext && window.location.hostname !== 'localhost' && (
           <div className='mt-1 text-red-500'>
             Note: Voice input requires HTTPS connection.
           </div>
