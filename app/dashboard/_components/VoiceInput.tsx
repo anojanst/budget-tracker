@@ -320,41 +320,7 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         )}
       </div>
 
-      {/* Transcript Display */}
-      {transcript && (
-        <div className='mt-2 p-2 bg-white border rounded text-sm'>
-          <div className='font-semibold text-xs text-muted-foreground mb-1'>Transcript:</div>
-          <div className='text-sm'>{transcript}</div>
-        </div>
-      )}
-
-      {/* Parsed Data Display */}
-      {parsedData && (
-        <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm'>
-          <div className='font-semibold text-xs text-blue-700 mb-2'>Parsed Data:</div>
-          <div className='space-y-1 text-xs'>
-            {parsedData.name && (
-              <div><span className='font-medium'>Name:</span> {parsedData.name}</div>
-            )}
-            {parsedData.amount && (
-              <div><span className='font-medium'>Amount:</span> ${parsedData.amount}</div>
-            )}
-            {parsedData.date && (
-              <div><span className='font-medium'>Date:</span> {parsedData.date}</div>
-            )}
-            {parsedData.tag && (
-              <div><span className='font-medium'>Tag:</span> {parsedData.tag}</div>
-            )}
-            {parsedData.category && (
-              <div><span className='font-medium'>Category:</span> {parsedData.category}</div>
-            )}
-            {!parsedData.name && !parsedData.amount && !parsedData.date && !parsedData.tag && !parsedData.category && (
-              <div className='text-muted-foreground italic'>No data extracted from transcript</div>
-            )}
-          </div>
-        </div>
-      )}
-
+      
       {/* Error Display */}
       {error && (
         <div className='mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm'>
