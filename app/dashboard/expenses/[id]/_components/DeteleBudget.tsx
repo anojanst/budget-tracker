@@ -22,6 +22,10 @@ function DeleteBudget(props: { budgetId: number }) {
 
     const deleteBudget = async (budgetId: number) => {
         try {
+            // Delete expenses that belong to this budget (using budgetId directly)
+            await db.delete(Expenses).where(eq(Expenses.budgetId, budgetId));
+
+            // Delete tags that belong to this budget
             const relatedTags = await db
                 .select({ id: Tags.id })
                 .from(Tags)
@@ -30,10 +34,10 @@ function DeleteBudget(props: { budgetId: number }) {
             const tagIds = relatedTags.map(tag => tag.id);
 
             if (tagIds.length > 0) {
-                await db.delete(Expenses).where(inArray(Expenses.tagId, tagIds));
                 await db.delete(Tags).where(inArray(Tags.id, tagIds));
             }
 
+            // Delete the budget itself
             const result = await db.delete(Budgets).where(eq(Budgets.id, budgetId)).returning();
 
             if (result.length > 0) {
