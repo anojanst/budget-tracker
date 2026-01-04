@@ -29,7 +29,7 @@ function BudgetList() {
         })
         .from(Budgets)
         .leftJoin(Tags, eq(Tags.budgetId, Budgets.id))
-        .leftJoin(Expenses, eq(Expenses.tagId, Tags.id))
+        .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
         .where(eq(Budgets.createdBy, userEmail))
         .groupBy(Budgets.id)
         .orderBy(desc(Budgets.id))

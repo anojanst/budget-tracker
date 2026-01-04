@@ -18,9 +18,8 @@ const BudgetComparisonChart = () => {
                 totalAmountSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("total_amount_spent"),
             })
             .from(Budgets)
-            .leftJoin(Tags, eq(Tags.budgetId, Budgets.id))
-            .leftJoin(Expenses, eq(Expenses.tagId, Tags.id))
-            .where(eq(Expenses.createdBy, userEmail))
+            .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
+            .where(eq(Budgets.createdBy, userEmail))
             .groupBy(Budgets.name, Budgets.amount);
 
         return data;

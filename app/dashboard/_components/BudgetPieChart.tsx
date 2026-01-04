@@ -20,8 +20,8 @@ const BudgetPieChart = () => {
         totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("totalSpent"),
       })
       .from(Budgets)
-      .leftJoin(Expenses, sql`${Expenses.budgetId} = ${Budgets.id}`)
-      .where(eq(Expenses.createdBy, createdBy))
+      .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
+      .where(eq(Budgets.createdBy, createdBy))
       .groupBy(Budgets.name);
   
     // Get savings total (contributions are recorded as expenses with "Savings:" prefix)
