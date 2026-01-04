@@ -291,14 +291,14 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   }
 
   return (
-    <div className='flex flex-col gap-2 p-3 border rounded-lg bg-slate-50'>
+    <div>
       <div className='flex items-center gap-2'>
         <Button
           type='button'
-          variant={isListening ? 'destructive' : 'outline'}
+          variant={isListening ? 'destructive' : 'default'}
           size='sm'
           onClick={isListening ? stopListening : startListening}
-          className='flex items-center gap-2'
+          className='flex items-center gap-2 w-full'
         >
           {isListening ? (
             <>
