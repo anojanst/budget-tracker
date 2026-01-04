@@ -16,7 +16,8 @@ function BudgetList() {
 
   const getBudgetsByUser = async (userEmail: string) => {
     try {
-      const budgets = await db
+      // Get budgets with tag count (separate query to avoid duplication)
+      const budgetsWithTags = await db
         .select({
           id: Budgets.id,
           name: Budgets.name,
@@ -24,15 +25,32 @@ function BudgetList() {
           icon: Budgets.icon,
           createdBy: Budgets.createdBy,
           tagCount: sql<number>`COUNT(DISTINCT ${Tags.id})`.as("tag_count"),
-          totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("total_spent"),
-          expenseCount: sql<number>`COUNT(${Expenses.id})`.as("expense_count"),
         })
         .from(Budgets)
         .leftJoin(Tags, eq(Tags.budgetId, Budgets.id))
-        .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
         .where(eq(Budgets.createdBy, userEmail))
-        .groupBy(Budgets.id)
-        .orderBy(desc(Budgets.id))
+        .groupBy(Budgets.id);
+
+      // Get expense totals per budget (separate query to avoid duplication from Tags join)
+      const expenseTotals = await db
+        .select({
+          budgetId: Expenses.budgetId,
+          totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("total_spent"),
+          expenseCount: sql<number>`COUNT(${Expenses.id})`.as("expense_count"),
+        })
+        .from(Expenses)
+        .where(eq(Expenses.createdBy, userEmail))
+        .groupBy(Expenses.budgetId);
+
+      // Combine the results
+      const expenseMap = new Map(expenseTotals.map(e => [e.budgetId, { totalSpent: Number(e.totalSpent), expenseCount: Number(e.expenseCount) }]));
+      
+      const budgets = budgetsWithTags.map(budget => ({
+        ...budget,
+        tagCount: Number(budget.tagCount),
+        totalSpent: expenseMap.get(budget.id)?.totalSpent || 0,
+        expenseCount: expenseMap.get(budget.id)?.expenseCount || 0,
+      })).sort((a, b) => b.id - a.id);
 
       return budgets;
     } catch (error) {

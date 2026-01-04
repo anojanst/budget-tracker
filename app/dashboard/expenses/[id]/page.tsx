@@ -39,7 +39,8 @@ function ExpensesPage() {
 
   const getBudgetById = async (id: number, userEmail: string) => {
     try {
-      const budgets = await db
+      // Get budget with tag count (separate query to avoid duplication)
+      const budgetsWithTags = await db
         .select({
           id: Budgets.id,
           name: Budgets.name,
@@ -47,16 +48,31 @@ function ExpensesPage() {
           icon: Budgets.icon,
           createdBy: Budgets.createdBy,
           tagCount: sql<number>`COUNT(DISTINCT ${Tags.id})`.as("tag_count"),
-          totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("total_spent"),
-          expenseCount: sql<number>`COUNT(${Expenses.id})`.as("expense_count"),
         })
         .from(Budgets)
         .leftJoin(Tags, eq(Tags.budgetId, Budgets.id))
-        .leftJoin(Expenses, eq(Expenses.budgetId, Budgets.id))
         .where(and(eq(Budgets.createdBy, userEmail), eq(Budgets.id, id)))
         .groupBy(Budgets.id);
 
-      return budgets[0]
+      // Get expense totals for this budget (separate query to avoid duplication from Tags join)
+      const expenseTotals = await db
+        .select({
+          totalSpent: sql<number>`COALESCE(SUM(${Expenses.amount}), 0)`.as("total_spent"),
+          expenseCount: sql<number>`COUNT(${Expenses.id})`.as("expense_count"),
+        })
+        .from(Expenses)
+        .where(and(eq(Expenses.createdBy, userEmail), eq(Expenses.budgetId, id)));
+
+      // Combine the results
+      const budget = budgetsWithTags[0];
+      if (!budget) return undefined;
+
+      return {
+        ...budget,
+        tagCount: Number(budget.tagCount),
+        totalSpent: Number(expenseTotals[0]?.totalSpent || 0),
+        expenseCount: Number(expenseTotals[0]?.expenseCount || 0),
+      }
     } catch (error) {
       console.error("Error fetching budgets:", error);
       throw new Error("Failed to fetch budgets");
