@@ -6,7 +6,20 @@ import { db } from "@/utils/dbConfig";
 import { Budgets, Expenses, Tags } from "@/utils/schema";
 import { useUser } from "@clerk/nextjs";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28DFF"];
+const COLORS = [
+  "#3B82F6", // Blue - vibrant and professional
+  "#10B981", // Emerald - fresh and modern
+  "#F59E0B", // Amber - warm and inviting
+  "#EF4444", // Red - attention-grabbing
+  "#8B5CF6", // Purple - elegant
+  "#EC4899", // Pink - vibrant
+  "#06B6D4", // Cyan - cool and modern
+  "#84CC16", // Lime - fresh
+  "#F97316", // Orange - energetic
+  "#6366F1", // Indigo - sophisticated
+  "#14B8A6", // Teal - calming
+  "#A855F7", // Violet - rich
+];
 
 const BudgetPieChart = () => {
     const {user} = useUser()

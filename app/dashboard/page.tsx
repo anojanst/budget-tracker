@@ -96,46 +96,36 @@ function Dashboard() {
   }, [user])
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-semibold sm:text-3xl">
-        Hi, {user?.fullName} 👋
-      </h1>
-      <p className="text-muted-foreground">Track Smart, Spend Wise, Save More!</p>
+    <div className="mx-auto max-w-7xl p-3">
 
-      <div className="mt-4">
+      <div>
         <BudgetSummary
           total_amount_spent={total_amount_spent}
           total_budget_amount={total_budget_amount}
           total_expense_count={total_expense_count}
         />
-        <SavingGoalsSummary />
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2">
+          <div className="col-span-1">
+            <SavingGoalsSummary />
+          </div>
+          <div className="col-span-1 border rounded-lg p-3 mt-4">
+              <BudgetComparisonChart />
+          </div>
+        </div>
+        
       </div>
 
       {total_expense_count > 0 ? (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-6 lg:grid-cols-7">
-          <div className="sm:col-span-1 md:col-span-4 lg:col-span-3 rounded-lg border bg-card p-3">
-            <div className="flex items-center justify-between pb-2">
-              <h3 className="text-sm font-medium">Income vs Expense</h3>
-            </div>
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2">
+          <div className="col-span-1 rounded-lg border bg-card p-3">
             <div className="flex items-center justify-between gap-2">
               <div className="w-full">
-                <div className="aspect-[16/10] sm:aspect-[16/9] min-h-[220px]">
                   <IncomeExpenseBalanceChart count={total_expense_count} />
-                </div>
               </div>
             </div>
           </div>
-          <div className=" sm:col-span-1 md:col-span-2 lg:col-span-2 rounded-lg border bg-card p-3">
-            <h3 className="pb-2 text-sm font-medium">Budget Split</h3>
-            <div className="aspect-[1/1] min-h-[220px]">
+          <div className="col-span-1 rounded-lg border bg-card p-3">
               <BudgetPieChart />
-            </div>
-          </div>
-          <div className="sm:col-span-1 md:col-span-2 lg:col-span-2 rounded-lg border bg-card p-3">
-            <h3 className="pb-2 text-sm font-medium">Budget vs Spent</h3>
-            <div className="aspect-[16/12] min-h-[220px]">
-              <BudgetComparisonChart />
-            </div>
           </div>
         </div>
       ) : (

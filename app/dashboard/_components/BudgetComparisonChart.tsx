@@ -27,22 +27,27 @@ const BudgetComparisonChart = () => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await getBudgetComparisonData(user?.primaryEmailAddress?.emailAddress!);
-            setBudgetData(data);
+            // Truncate budget names to 3 letters
+            const truncatedData = data.map(item => ({
+                ...item,
+                name: item.name.substring(0, 4)
+            }));
+            setBudgetData(truncatedData);
         };
 
         user && fetchData();
     }, [user]);
 
     return (
-            <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={budgetData} margin={{ top: 20, right: 10, left: 0, bottom: 10 }}>
+            <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={budgetData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
-                    <Bar dataKey="amount" fill="#8884d8" barSize={20} name="Budget Amount" />
-                    <Bar dataKey="totalAmountSpent" fill="#82ca9d" barSize={20} name="Spent Amount" />
+                    {/* <Legend /> */}
+                    <Bar dataKey="amount" fill="#8884d8" barSize={10} name="Budget Amount" />
+                    <Bar dataKey="totalAmountSpent" fill="#82ca9d" barSize={10} name="Spent Amount" />
                 </BarChart>
             </ResponsiveContainer>
     );

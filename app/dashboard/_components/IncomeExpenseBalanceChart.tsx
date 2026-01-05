@@ -67,7 +67,7 @@ const IncomeExpenseBalanceChart = ({ count }: { count: number }) => {
     }, [count]);
 
     return (
-        <div className="w-full h-[340px] justify-start items-start border rounded-lg mt-5">
+        <div className="w-full h-[340px] justify-start items-start">
             <div className="flex justify-end items-center p-3 gap-2">
                 <Button
                     onClick={() => setPeriod("month")}
