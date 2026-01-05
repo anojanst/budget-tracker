@@ -9,7 +9,7 @@ export default function ProfilePage() {
       <div className="mb-4 md:mb-6">
         <div className="flex items-center gap-2 mb-2">
           <User className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-2xl md:text-3xl font-bold">Account Settings</h1>
+          <h1 className="text-lg md:text-xl font-bold">Account Settings</h1>
         </div>
         <p className="text-sm text-muted-foreground">
           Manage your account settings and preferences

@@ -31,7 +31,7 @@ function Toolkits() {
   ]
   return (
     <div className='w-full p-5'>
-      <h2 className='text-3xl font-semibold mb-4 mt-5'>Your Financial Swiss Knife</h2>
+      <h2 className='text-xl font-semibold mb-4 mt-5'>Your Financial Swiss Knife</h2>
       <div className='grid grid-cols-4 gap-5'>
         {tools.map((item, index) => (
           <Link className='col-span-1' key={item.id} href={item.path}>

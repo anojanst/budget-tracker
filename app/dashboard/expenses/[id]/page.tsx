@@ -132,7 +132,7 @@ function ExpensesPage() {
   return (
     <div className='mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8'>
       <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-2xl'>{budget?.name}</h1>
+        <h1 className='font-bold text-lg'>{budget?.name}</h1>
         <div className='flex gap-2'>
           <EditBudget budget={budget!} refreshData={() => fetchData()} />
           <DeleteBudget budgetId={budget?.id!} />

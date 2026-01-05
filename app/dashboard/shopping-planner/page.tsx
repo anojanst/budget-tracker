@@ -168,7 +168,7 @@ function ShoppingPlannerPage() {
   return (
     <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
       <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-3xl'>Shopping Planner</h1>
+        <h1 className='font-bold text-xl'>Shopping Planner</h1>
         {!currentPlan && (
           <CreateShoppingPlan refreshData={fetchPlans} />
         )}
@@ -192,7 +192,7 @@ function ShoppingPlannerPage() {
 
           {completedPlans.length > 0 && (
             <div className='mt-8'>
-              <h2 className='font-bold text-2xl mb-4'>History</h2>
+              <h2 className='font-bold text-lg mb-4'>History</h2>
               <div className='space-y-4'>
                 {completedPlans.map((plan) => (
                   <ShoppingPlanList 

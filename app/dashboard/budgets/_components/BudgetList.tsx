@@ -50,7 +50,7 @@ function BudgetList() {
         tagCount: Number(budget.tagCount),
         totalSpent: expenseMap.get(budget.id)?.totalSpent || 0,
         expenseCount: expenseMap.get(budget.id)?.expenseCount || 0,
-      })).sort((a, b) => b.id - a.id);
+      })).sort((a, b) => b.amount - a.amount);
 
       return budgets;
     } catch (error) {

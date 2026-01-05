@@ -20,7 +20,7 @@ function Loans() {
   return (
     <div className='p-10'>
       <div className='flex justify-between pb-3'>
-        <h1 className='font-bold text-3xl'>Loans</h1>
+        <h1 className='font-bold text-xl'>Loans</h1>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-5 mt-4'>
         <div className='col-span-1'>
