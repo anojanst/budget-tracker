@@ -30,25 +30,26 @@ function Toolkits() {
     },
   ]
   return (
-    <div className='w-full p-5'>
-      <h2 className='text-xl font-semibold mb-4 mt-5'>Your Financial Swiss Knife</h2>
-      <div className='grid grid-cols-4 gap-5'>
+    <div className='w-full px-2 py-3 pb-6 md:px-4 md:py-4 lg:px-6 lg:py-6 max-w-7xl mx-auto'>
+      <div className='mb-4 md:mb-6'>
+        <h2 className='text-lg md:text-xl font-semibold'>Your Financial Swiss Knife</h2>
+        <p className='text-sm text-muted-foreground mt-1'>Calculate taxes, loans, investments, and more</p>
+      </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4'>
         {tools.map((item, index) => (
-          <Link className='col-span-1' key={item.id} href={item.path}>
+          <Link key={item.id} href={item.path}>
             <div
-              key={item.id}
-              className={`flex items-center rounded-md w-full p-5 mt-1 border-2 font-medium cursor-pointer hover:border-primary
+              className={`flex flex-col items-center justify-center rounded-lg w-full p-4 md:p-5 border-2 font-medium cursor-pointer transition-all hover:scale-105
                 ${index % 2 === 0
-                  ? "bg-primary border-primary text-white hover:text-primary hover:bg-purple-200"
-                  : "bg-purple-200 border-purple-200 text-primary"
+                  ? "bg-primary border-primary text-white hover:bg-primary/90"
+                  : "bg-card border-border hover:border-primary"
                 }`}
             >
-              <item.icon className='mr-2' size={40} />
-              <span className='text-lg'>{item.name}</span>
+              <item.icon className='mb-2 md:mb-3' size={32} />
+              <span className='text-sm md:text-base text-center'>{item.name}</span>
             </div>
           </Link>
         ))}
-
       </div>
     </div>
   )
