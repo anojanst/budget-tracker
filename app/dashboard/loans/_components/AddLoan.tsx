@@ -48,30 +48,52 @@ function AddLoan(props: { refreshData: () => void }) {
 
     return (
         <div>
-            <div className='p-3 border rounded-lg'>
-                <h2 className='font-semibold mb-4'>Add New Loan</h2>
-                <div className='grid grid-cols-1 gap-2'>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Lender Name</h1>
-                        <Input placeholder='Lender - Eg: Bank XYZ' value={lender} className='h-8' onChange={(e) => setLender(e.target.value)} />
+            <h2 className='font-semibold text-sm md:text-base mb-3'>Add Loan</h2>
+            <div className='space-y-3'>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Lender - Eg: Bank XYZ' 
+                            value={lender} 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setLender(e.target.value)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Loan Amount</h1>
-                        <Input placeholder='Amount - Eg: 5000' value={amount} type='number' className='h-8' min={0} onChange={(e) => setAmount(parseInt(e.target.value))} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Loan Amount - Eg: 5000' 
+                            value={amount} 
+                            type='number' 
+                            className='h-9 md:h-10' 
+                            min={0} 
+                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Interest Rate (%)</h1>
-                        <Input placeholder='Eg: 5.5' value={interestRate} type='number' className='h-8' min={0} step="0.1" onChange={(e) => setInterestRate(parseFloat(e.target.value))} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Interest Rate (%) - Eg: 5.5' 
+                            value={interestRate} 
+                            type='number' 
+                            className='h-9 md:h-10' 
+                            min={0} 
+                            step="0.1" 
+                            onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Tenure (Months)</h1>
-                        <Input placeholder='Eg: 24' value={tenure} type='number' className='h-8' min={1} onChange={(e) => setTenure(parseInt(e.target.value))} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Tenure (Months) - Eg: 24' 
+                            value={tenure} 
+                            type='number' 
+                            className='h-9 md:h-10' 
+                            min={1} 
+                            onChange={(e) => setTenure(parseInt(e.target.value) || 12)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Repayment Frequency</h1>
+                    <div className='md:col-span-1'>
                         <Select value={repaymentFrequency} onValueChange={setRepaymentFrequency}>
-                            <SelectTrigger className="h-8">
-                                <SelectValue placeholder="Select repayment frequency" />
+                            <SelectTrigger className="h-9 md:h-10">
+                                <SelectValue placeholder="Repayment Frequency" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="monthly">Monthly</SelectItem>
@@ -80,17 +102,23 @@ function AddLoan(props: { refreshData: () => void }) {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold mb-2'>Next Due Date</h1>
-                        <Input placeholder='Start Date' value={nextDueDate} type='date' className='h-8' onChange={(e) => setNextDueDate(e.target.value)} />
-                    </div>
-                    <div className='mt-1 col-span-1'>
-                        <Button
-                            disabled={!(lender && amount && interestRate && tenure && nextDueDate && repaymentFrequency)}
-                            onClick={saveLoan}
-                            className='w-full h-8'>Save Loan</Button>
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Next Due Date' 
+                            value={nextDueDate} 
+                            type='date' 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setNextDueDate(e.target.value)} 
+                        />
                     </div>
                 </div>
+                <Button
+                    disabled={!(lender && amount && interestRate && tenure && nextDueDate && repaymentFrequency)}
+                    onClick={saveLoan}
+                    className='w-full h-9 md:h-10'
+                >
+                    Save Loan
+                </Button>
             </div>
         </div>
     );
