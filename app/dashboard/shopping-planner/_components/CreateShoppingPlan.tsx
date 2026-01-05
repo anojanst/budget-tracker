@@ -40,9 +40,9 @@ function CreateShoppingPlan({ refreshData }: { refreshData: () => void }) {
         type='date'
         value={planDate}
         onChange={(e) => setPlanDate(e.target.value)}
-        className='w-auto'
+        className='h-9 md:h-10 w-auto'
       />
-      <Button onClick={createPlan} disabled={isCreating}>
+      <Button onClick={createPlan} disabled={isCreating} className='h-9 md:h-10'>
         {isCreating ? 'Creating...' : 'Create Plan'}
       </Button>
     </div>

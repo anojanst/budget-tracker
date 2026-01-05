@@ -166,16 +166,17 @@ function ShoppingPlannerPage() {
   }
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
-      <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-xl'>Shopping Planner</h1>
+    <div className='w-full px-2 py-3 pb-6 md:px-4 md:py-4 lg:px-6 lg:py-6 max-w-7xl mx-auto'>
+      {/* Header */}
+      <div className='flex flex-col gap-3 mb-4 md:flex-row md:items-center md:justify-between md:mb-6'>
+        <h1 className='font-bold text-lg md:text-xl'>Shopping Planner</h1>
         {!currentPlan && (
           <CreateShoppingPlan refreshData={fetchPlans} />
         )}
       </div>
 
       {loading ? (
-        <div className='mt-6'>Loading...</div>
+        <div className='mt-6 text-center text-muted-foreground'>Loading...</div>
       ) : (
         <>
           {currentPlan ? (
@@ -185,14 +186,14 @@ function ShoppingPlannerPage() {
               isCurrentPlan={true}
             />
           ) : (
-            <div className='mt-6 text-center text-muted-foreground'>
-              <p>No active shopping plan. Create one to get started!</p>
+            <div className='border rounded-lg p-6 md:p-8 bg-card text-center text-muted-foreground'>
+              <p className='text-sm md:text-base'>No active shopping plan. Create one to get started!</p>
             </div>
           )}
 
           {completedPlans.length > 0 && (
-            <div className='mt-8'>
-              <h2 className='font-bold text-lg mb-4'>History</h2>
+            <div className='mt-6 md:mt-8'>
+              <h2 className='font-bold text-base md:text-lg mb-4'>History</h2>
               <div className='space-y-4'>
                 {completedPlans.map((plan) => (
                   <ShoppingPlanList 

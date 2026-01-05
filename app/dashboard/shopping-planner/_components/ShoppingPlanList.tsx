@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import ShoppingItemComponent from './ShoppingItem'
 import AddShoppingItem from './AddShoppingItem'
 import AddItemAfterPurchase from './AddItemAfterPurchase'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ShoppingCart, CheckCircle2, XCircle, DollarSign } from 'lucide-react'
 import CompletePlanDialog from './CompletePlanDialog'
 import MarkTripCompleteDialog from './MarkTripCompleteDialog'
@@ -68,74 +67,86 @@ function ShoppingPlanList({
   }
 
   return (
-    <Card className='mt-6'>
-      <CardHeader>
-        <div className='flex justify-between items-center'>
-          <div className='flex items-center gap-2 flex-wrap'>
-            <CardTitle className='flex items-center gap-2'>
-              <ShoppingCart className='h-5 w-5' />
+    <div className='border rounded-lg p-3 md:p-4 bg-card mb-4 md:mb-6'>
+      {/* Header */}
+      <div className='flex flex-col gap-3 mb-4 md:flex-row md:items-center md:justify-between'>
+        <div className='flex items-center gap-2 flex-wrap'>
+          <div className='flex items-center gap-2'>
+            <ShoppingCart className='h-4 w-4 md:h-5 md:w-5 text-muted-foreground' />
+            <h2 className='font-bold text-base md:text-lg'>
               Shopping Plan {plan.planNumber || 1} ({format(new Date(plan.planDate), 'MMM dd, yyyy')})
-            </CardTitle>
+            </h2>
+          </div>
+          <div className='flex items-center gap-2'>
             {getStatusBadge()}
             {plan.verdict && getVerdictBadge()}
           </div>
-          {isCurrentPlan && (
-            <div className='flex gap-2'>
-              {plan.status === 'draft' && plan.items.length > 0 && (
-                <CompletePlanDialog planId={plan.id} refreshData={refreshData} />
-              )}
-              {plan.status === 'ready' && (
-                <Button 
-                  variant='default'
-                  onClick={async () => {
-                    try {
-                      await db.update(ShoppingPlans).set({ status: 'shopping' }).where(eq(ShoppingPlans.id, plan.id))
-                      toast.success('Shopping started!')
-                      refreshData()
-                    } catch (error) {
-                      console.error('Error starting shopping:', error)
-                      toast.error('Failed to start shopping')
-                    }
-                  }}
-                >
-                  Start Shopping
-                </Button>
-              )}
-              {plan.status === 'shopping' && (
-                <MarkTripCompleteDialog planId={plan.id} refreshData={refreshData} />
-              )}
-              {plan.status === 'post_shopping' && (
-                <>
-                  {purchasedItems.length > 0 && (
-                    <Button 
-                      variant='default'
-                      onClick={() => setShowBulkAddPrices(true)}
-                    >
-                      Bulk Add Prices
-                    </Button>
-                  )}
-                  <Button 
-                    variant='outline' 
-                    onClick={() => setShowAddAfterPurchase(true)}
-                  >
-                    Add Out of Plan
-                  </Button>
-                  <MarkAsFinalDialog planId={plan.id} refreshData={refreshData} />
-                </>
-              )}
-            </div>
-          )}
         </div>
-      </CardHeader>
-      <CardContent>
-        {isCurrentPlan && (plan.status === 'draft' || plan.status === 'ready') && (
-          <div className='mb-4'>
-            {plan.status === 'draft' ? (
+        {isCurrentPlan && (
+          <div className='flex flex-wrap gap-2'>
+            {plan.status === 'draft' && plan.items.length > 0 && (
+              <CompletePlanDialog planId={plan.id} refreshData={refreshData} />
+            )}
+            {plan.status === 'ready' && (
+              <Button 
+                variant='default'
+                size='sm'
+                className='h-8 md:h-9'
+                onClick={async () => {
+                  try {
+                    await db.update(ShoppingPlans).set({ status: 'shopping' }).where(eq(ShoppingPlans.id, plan.id))
+                    toast.success('Shopping started!')
+                    refreshData()
+                  } catch (error) {
+                    console.error('Error starting shopping:', error)
+                    toast.error('Failed to start shopping')
+                  }
+                }}
+              >
+                Start Shopping
+              </Button>
+            )}
+            {plan.status === 'shopping' && (
+              <MarkTripCompleteDialog planId={plan.id} refreshData={refreshData} />
+            )}
+            {plan.status === 'post_shopping' && (
               <>
-                <div className='flex gap-2 mb-2'>
+                {purchasedItems.length > 0 && (
+                  <Button 
+                    variant='default'
+                    size='sm'
+                    className='h-8 md:h-9'
+                    onClick={() => setShowBulkAddPrices(true)}
+                  >
+                    Bulk Add Prices
+                  </Button>
+                )}
+                <Button 
+                  variant='outline'
+                  size='sm'
+                  className='h-8 md:h-9'
+                  onClick={() => setShowAddAfterPurchase(true)}
+                >
+                  Add Out of Plan
+                </Button>
+                <MarkAsFinalDialog planId={plan.id} refreshData={refreshData} />
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Content */}
+      <div>
+        {isCurrentPlan && (plan.status === 'draft' || plan.status === 'ready') && (
+          <div className='mb-4 md:mb-6'>
+            {plan.status === 'draft' ? (
+              <div className='border rounded-lg p-3 md:p-4 bg-slate-50'>
+                <div className='flex gap-2 mb-3'>
                   <Button
                     variant='outline'
                     size='sm'
+                    className='h-8 md:h-9'
                     onClick={() => setShowBulkAddItems(true)}
                   >
                     Bulk Add Items
@@ -145,9 +156,9 @@ function ShoppingPlanList({
                   planId={plan.id} 
                   refreshData={refreshData}
                 />
-              </>
+              </div>
             ) : (
-              <div className='p-4 border rounded-lg bg-slate-50 text-center text-muted-foreground'>
+              <div className='p-4 border rounded-lg bg-slate-50 text-center text-muted-foreground text-sm md:text-base'>
                 Plan is ready for shopping. Click "Start Shopping" to begin.
               </div>
             )}
@@ -179,26 +190,27 @@ function ShoppingPlanList({
           />
         )}
 
-        <div className='mb-4'>
-          <div className='flex items-center justify-between gap-4 p-3 bg-blue-50 rounded-md'>
+        {/* Summary Section */}
+        <div className='mb-4 md:mb-6'>
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 p-3 md:p-4 bg-blue-50 rounded-lg border border-blue-100'>
             <div className='flex items-center gap-2'>
-              <DollarSign className='h-5 w-5 text-blue-600' />
+              <DollarSign className='h-4 w-4 md:h-5 md:w-5 text-blue-600 flex-shrink-0' />
               <div>
-                <p className='text-sm text-muted-foreground'>Estimated Total</p>
-                <p className='font-semibold'>${plan.totalEstimate.toFixed(2)}</p>
+                <p className='text-xs md:text-sm text-muted-foreground'>Estimated Total</p>
+                <p className='font-semibold text-sm md:text-base'>${plan.totalEstimate.toFixed(2)}</p>
               </div>
             </div>
-            <div className='flex items-center gap-4'>
-              <div className='text-right'>
-                <p className='text-sm text-muted-foreground'>To Purchase</p>
-                <p className='font-semibold'>{unpurchasedItems.length} items</p>
+            <div className='flex items-center justify-between md:justify-end gap-4'>
+              <div className='text-left md:text-right'>
+                <p className='text-xs md:text-sm text-muted-foreground'>To Purchase</p>
+                <p className='font-semibold text-sm md:text-base'>{unpurchasedItems.length} items</p>
               </div>
               {(plan.status === 'completed' || plan.totalActual > 0) && (
-                <div className='flex items-center gap-2 pl-4 border-l'>
-                  <DollarSign className='h-5 w-5 text-green-600' />
+                <div className='flex items-center gap-2 md:pl-4 md:border-l'>
+                  <DollarSign className='h-4 w-4 md:h-5 md:w-5 text-green-600 flex-shrink-0' />
                   <div>
-                    <p className='text-sm text-muted-foreground'>Actual Total</p>
-                    <p className='font-semibold'>${plan.totalActual.toFixed(2)}</p>
+                    <p className='text-xs md:text-sm text-muted-foreground'>Actual Total</p>
+                    <p className='font-semibold text-sm md:text-base'>${plan.totalActual.toFixed(2)}</p>
                   </div>
                 </div>
               )}
@@ -207,12 +219,12 @@ function ShoppingPlanList({
         </div>
 
         {unpurchasedItems.length > 0 && (
-          <div className='mb-4'>
-            <h3 className='font-semibold mb-2 flex items-center gap-2'>
+          <div className='mb-4 md:mb-6'>
+            <h3 className='font-semibold text-sm md:text-base mb-3 flex items-center gap-2'>
               <XCircle className='h-4 w-4 text-orange-500' />
               To Purchase ({unpurchasedItems.length})
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4'>
               {unpurchasedItems.map((item) => (
                 <ShoppingItemComponent
                   key={item.id}
@@ -227,12 +239,12 @@ function ShoppingPlanList({
         )}
 
         {purchasedItems.length > 0 && (
-          <div className='mb-4'>
-            <h3 className='font-semibold mb-2 flex items-center gap-2'>
+          <div className='mb-4 md:mb-6'>
+            <h3 className='font-semibold text-sm md:text-base mb-3 flex items-center gap-2'>
               <CheckCircle2 className='h-4 w-4 text-green-500' />
               Purchased ({purchasedItems.length})
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4'>
               {purchasedItems.map((item) => (
                 <ShoppingItemComponent
                   key={item.id}
@@ -247,12 +259,12 @@ function ShoppingPlanList({
         )}
 
         {outOfPlanItems.length > 0 && (
-          <div className='mb-4'>
-            <h3 className='font-semibold mb-2 flex items-center gap-2'>
+          <div className='mb-4 md:mb-6'>
+            <h3 className='font-semibold text-sm md:text-base mb-3 flex items-center gap-2'>
               <CheckCircle2 className='h-4 w-4 text-purple-500' />
               Out of Plan ({outOfPlanItems.length})
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4'>
               {outOfPlanItems.map((item) => (
                 <ShoppingItemComponent
                   key={item.id}
@@ -267,11 +279,11 @@ function ShoppingPlanList({
         )}
 
         {movedItems.length > 0 && (
-          <div className='mb-4'>
-            <h3 className='font-semibold mb-2 text-muted-foreground'>
+          <div className='mb-4 md:mb-6'>
+            <h3 className='font-semibold text-sm md:text-base mb-3 text-muted-foreground'>
               Moved to Next Plan ({movedItems.length})
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4'>
               {movedItems.map((item) => (
                 <ShoppingItemComponent
                   key={item.id}
@@ -286,12 +298,12 @@ function ShoppingPlanList({
         )}
 
         {plan.items.length === 0 && (
-          <div className='text-center text-muted-foreground py-8'>
+          <div className='text-center text-muted-foreground py-8 text-sm md:text-base'>
             <p>No items in this plan yet. Add your first item!</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 
