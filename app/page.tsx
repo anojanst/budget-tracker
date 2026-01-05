@@ -1,13 +1,5 @@
-import Footer from "./_components/Footer";
-import Header from "./_components/Header";
-import Hero from "./_components/Hero";
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  return (
-    <div>
-      <Header />
-      <Hero />
-      <Footer />
-    </div>
-  );
+  redirect('/sign-in')
 }

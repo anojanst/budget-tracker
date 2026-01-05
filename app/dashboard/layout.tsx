@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { useRouter, usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { getPendingRepaymentsCount } from "@/utils/loanUtils";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { useUser, SignOutButton } from "@clerk/nextjs";
 import {
   Landmark,
   LayoutGrid,
@@ -17,6 +17,7 @@ import {
   Wallet,
   ShoppingCart,
   Target,
+  User,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -49,6 +50,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
       { id: 7, name: "Saving Goals", icon: Target, path: "/dashboard/saving-goals" },
       { id: 8, name: "Upgrade", icon: ShieldCheck, path: "/dashboard/upgrade" },
       { id: 9, name: "Toolkits", icon: PocketKnife, path: "/dashboard/toolkits" },
+      { id: 10, name: "Profile", icon: User, path: "/dashboard/profile" },
     ],
     []
   );
@@ -79,43 +81,42 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background">
       {/* Top bar (mobile + desktop) */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto flex h-14 max-w-8xl items-center justify-between px-3 sm:px-4">
-          <Link href="/dashboard" className="flex items-center gap-2" aria-label="Dashboard home">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="flex h-12 md:h-14 items-center justify-between px-3 md:px-4 lg:px-6">
+          <Link href="/dashboard" className="flex items-center" aria-label="Dashboard home">
             <Image
               src="/logo.png"
               alt="logo"
-              width={200}
-              height={56}
+              width={140}
+              height={40}
               priority
-              sizes="(max-width: 640px) 140px, 200px"
-              className="h-9 w-auto max-w-[160px] sm:h-11 sm:max-w-[200px] object-contain"
+              className="h-8 md:h-10 w-auto object-contain"
             />
           </Link>
           
+          {/* Mobile menu button */}
           <div className="md:hidden">
             <MobileSidebar menuList={menuList} pathname={pathname} count={count} />
           </div>
-          
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-8xl">
-        {/* Sidebar (desktop) */}
-        <aside className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] w-64 shrink-0 border-r bg-background p-5 shadow-sm md:block">
+      <div className="w-full flex">
+        {/* Desktop Sidebar - hidden on mobile, visible on md+ */}
+        <aside className="hidden md:block md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:w-64 md:shrink-0 md:border-r md:bg-background md:p-4 lg:p-6">
           <nav className="mt-2 space-y-1 overflow-y-auto pr-1">
             {menuList.map((item) => (
               <Link key={item.id} href={item.path}>
                 <div
-                  className={`flex items-center rounded-md p-3 text-sm font-medium transition-colors hover:bg-purple-200 hover:text-primary ${
-                    pathname === item.path ? "bg-purple-200 text-primary" : "text-muted-foreground"
+                  className={`flex items-center rounded-md p-3 text-sm font-medium transition-colors hover:bg-purple-100 hover:text-primary ${
+                    pathname === item.path ? "bg-purple-100 text-primary" : "text-muted-foreground"
                   }`}
                 >
                   <item.icon className="mr-2 h-5 w-5" />
                   <span className="truncate">
                     {item.name}
                     {count > 0 && item.name === "Loans" && (
-                      <Badge className="ml-2 animate-pulse">{`${count} Pending`}</Badge>
+                      <Badge className="ml-2 text-xs">{count}</Badge>
                     )}
                   </span>
                 </div>
@@ -123,14 +124,20 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
 
-          <div className="absolute bottom-5 left-0 right-0 flex items-center gap-3 p-5 text-sm text-muted-foreground">
-            <UserButton />
-            <span>Profile</span>
+          <div className="absolute bottom-4 left-0 right-0 px-4 border-t pt-4">
+            <SignOutButton>
+              <Button 
+                variant="outline" 
+                className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 text-sm"
+              >
+                Sign Out
+              </Button>
+            </SignOutButton>
           </div>
         </aside>
 
-        {/* Main content */}
-        <main className="flex-1 p-3 sm:p-4 md:ml-0">
+        {/* Main content - mobile-first, with margin on desktop for sidebar */}
+        <main className="w-full md:ml-0">
           {children}
         </main>
       </div>
@@ -149,27 +156,27 @@ function MobileSidebar({
 }) {
   return (
     <Sheet>
-      <SheetContent side="left" className="w-80 sm:w-96 z-[60]">
+      <SheetContent side="left" className="w-[280px] z-[60]">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Image src="/logo.png" alt="logo" width={160} height={48} className="h-8 w-auto object-contain" />
+          <SheetTitle className="flex items-center">
+            <Image src="/logo.png" alt="logo" width={140} height={40} className="h-8 w-auto object-contain" />
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-4 flex flex-col gap-1">
+        <div className="mt-6 flex flex-col gap-1">
           {menuList.map((item) => (
             <SheetClose asChild key={item.id}>
               <Link href={item.path}>
                 <div
-                  className={`flex items-center rounded-md p-3 text-base font-medium transition-colors hover:bg-purple-200 hover:text-primary ${
-                    pathname === item.path ? "bg-purple-200 text-primary" : "text-muted-foreground"
+                  className={`flex items-center rounded-lg p-3 text-base font-medium transition-colors active:bg-purple-100 ${
+                    pathname === item.path ? "bg-purple-100 text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  <item.icon className="mr-2 h-5 w-5" />
-                  <span>
+                  <item.icon className="mr-3 h-5 w-5" />
+                  <span className="flex-1">
                     {item.name}
                     {count > 0 && item.name === "Loans" && (
-                      <Badge className="ml-2">{`${count} Pending`}</Badge>
+                      <Badge className="ml-2 text-xs">{count}</Badge>
                     )}
                   </span>
                 </div>
@@ -178,14 +185,20 @@ function MobileSidebar({
           ))}
         </div>
 
-        <div className="mt-6 flex items-center gap-3 text-sm text-muted-foreground">
-          <UserButton />
-          <span>Profile</span>
+        <div className="mt-auto pt-6 border-t">
+          <SignOutButton>
+            <Button 
+              variant="outline" 
+              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+            >
+              Sign Out
+            </Button>
+          </SignOutButton>
         </div>
       </SheetContent>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Open menu" className="text-foreground">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <Button variant="ghost" size="icon" aria-label="Open menu" className="h-9 w-9">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </Button>
       </SheetTrigger>
     </Sheet>

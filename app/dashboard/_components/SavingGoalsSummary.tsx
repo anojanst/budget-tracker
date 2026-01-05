@@ -4,11 +4,7 @@ import { useUser } from '@clerk/nextjs'
 import { db } from '@/utils/dbConfig'
 import { SavingGoals, SavingContributions } from '@/utils/schema'
 import { eq, sql } from 'drizzle-orm'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Target } from 'lucide-react'
-import { format } from 'date-fns'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { Target, TrendingUp } from 'lucide-react'
 
 function SavingGoalsSummary() {
   const { user } = useUser()
@@ -80,53 +76,44 @@ function SavingGoalsSummary() {
   const overallProgress = goalsSummary.totalTarget > 0 
     ? (goalsSummary.totalSaved / goalsSummary.totalTarget) * 100 
     : 0
+  const remaining = goalsSummary.totalTarget - goalsSummary.totalSaved
 
   return (
-    <Card className='mt-4'>
-      <CardHeader>
-        <div className='flex items-center justify-between'>
-          <CardTitle className='flex items-center gap-2'>
-            <Target className='h-5 w-5' />
-            Saving Goals
-          </CardTitle>
-          <Link href='/dashboard/saving-goals'>
-            <Button variant='outline' size='sm'>
-              View All
-            </Button>
-          </Link>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className='space-y-3'>
-          <div className='flex items-center justify-between'>
-            <span className='text-sm text-muted-foreground'>Total Saved</span>
-            <span className='text-lg font-semibold'>
-              ${goalsSummary.totalSaved.toLocaleString()} / ${goalsSummary.totalTarget.toLocaleString()}
-            </span>
-          </div>
-          <div className='w-full bg-slate-200 rounded-full h-2'>
-            <div
-              className='bg-green-500 h-2 rounded-full transition-all'
-              style={{ width: `${Math.min(overallProgress, 100)}%` }}
-            />
-          </div>
-          <div className='flex items-center justify-between text-sm'>
-            <div>
-              <span className='text-muted-foreground'>Active: </span>
-              <span className='font-medium'>{goalsSummary.activeGoals}</span>
-            </div>
-            <div>
-              <span className='text-muted-foreground'>Completed: </span>
-              <span className='font-medium text-green-600'>{goalsSummary.completedGoals}</span>
-            </div>
-            <div>
-              <span className='text-muted-foreground'>Progress: </span>
-              <span className='font-medium'>{overallProgress.toFixed(1)}%</span>
-            </div>
+    <div className='w-full border rounded-lg p-3 md:p-4 bg-card'>
+      <div className="flex gap-2 items-center justify-between mb-3">
+        <div className='flex gap-2 items-center'>
+          <Target size={20} className='bg-primary text-white p-2 h-10 w-10 md:h-12 md:w-12 rounded-full' />
+          <div className="flex flex-col">
+            <div className="text-lg md:text-xl font-bold">Saving Goals</div>
+            <div className="text-xs md:text-sm text-muted-foreground">{goalsSummary.totalGoals} Goals</div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+        <div className='text-right'>
+          <div className="text-base md:text-lg font-semibold text-primary">${goalsSummary.totalTarget.toLocaleString()}</div>
+          <div className="text-xs text-muted-foreground">Total Target</div>
+        </div>
+      </div>
+      <div className='w-full mt-3'>
+        <div className='flex gap-2 items-center justify-between text-gray-500 text-sm font-medium mb-2'>
+          <div className="flex items-center gap-2">
+            <TrendingUp size={16} className="text-muted-foreground" />
+            <p>${goalsSummary.totalSaved.toLocaleString()} saved</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Target size={16} className="text-muted-foreground" />
+            <p>${remaining >= 0 ? remaining.toLocaleString() : '0'} remaining</p>
+          </div>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2 md:h-2.5">
+          <div 
+            className={`h-full rounded-full transition-all ${
+              overallProgress >= 100 ? 'bg-green-500' : overallProgress > 50 ? 'bg-primary' : 'bg-yellow-500'
+            }`}
+            style={{ width: `${Math.min(overallProgress, 100)}%` }}
+          />
+        </div>
+      </div>
+    </div>
   )
 }
 

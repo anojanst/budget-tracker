@@ -96,43 +96,38 @@ function Dashboard() {
   }, [user])
 
   return (
-    <div className="mx-auto max-w-7xl p-3">
-
-      <div>
-        <BudgetSummary
-          total_amount_spent={total_amount_spent}
-          total_budget_amount={total_budget_amount}
-          total_expense_count={total_expense_count}
-        />
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <div className="col-span-1">
-            <SavingGoalsSummary />
-          </div>
-          <div className="col-span-1 border rounded-lg p-3 mt-4">
-              <BudgetComparisonChart />
-          </div>
+    <div className="w-full px-2 py-3 pb-6 md:px-4 md:py-4 lg:px-6 lg:py-6 max-w-7xl mx-auto">
+      {/* Mobile: Single column, Desktop: Two columns */}
+      <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+        {/* 1. Budget Summary */}
+        <div className="w-full">
+          <BudgetSummary
+            total_amount_spent={total_amount_spent}
+            total_budget_amount={total_budget_amount}
+            total_expense_count={total_expense_count}
+          />
         </div>
-        
+
+        {/* 2. Saving Summary */}
+        <div className="w-full">
+          <SavingGoalsSummary />
+        </div>
+
+        {/* 3. Budget Comparison Chart - Full width on all devices */}
+        <div className="w-full md:col-span-2 rounded-lg border bg-card p-2 md:p-3">
+          <BudgetComparisonChart />
+        </div>
+
+        {/* 4. Income Expense Balance Chart */}
+        <div className="w-full rounded-lg border bg-card p-2 md:p-3">
+          <IncomeExpenseBalanceChart count={total_expense_count} />
+        </div>
+
+        {/* 5. Pie Chart */}
+        <div className="w-full rounded-lg border bg-card p-2 md:p-3">
+          <BudgetPieChart />
+        </div>
       </div>
-
-      {total_expense_count > 0 ? (
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-2">
-          <div className="col-span-1 rounded-lg border bg-card p-3">
-            <div className="flex items-center justify-between gap-2">
-              <div className="w-full">
-                  <IncomeExpenseBalanceChart count={total_expense_count} />
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 rounded-lg border bg-card p-3">
-              <BudgetPieChart />
-          </div>
-        </div>
-      ) : (
-        <div className="mt-6 rounded-lg border bg-muted/30 p-6 text-sm text-muted-foreground">
-          No expenses yet. Add your first expense to see charts here.
-        </div>
-      )}
     </div>
   )
 }

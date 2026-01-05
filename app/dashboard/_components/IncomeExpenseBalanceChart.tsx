@@ -67,26 +67,26 @@ const IncomeExpenseBalanceChart = ({ count }: { count: number }) => {
     }, [count]);
 
     return (
-        <div className="w-full h-[340px] justify-start items-start">
-            <div className="flex justify-end items-center p-3 gap-2">
+        <div className="w-full">
+            <div className="flex justify-end items-center p-2 gap-2">
                 <Button
                     onClick={() => setPeriod("month")}
                     variant="outline"
-                    className={`h-8 ${period === "month" && "bg-primary text-white"}`}
+                    className={`h-7 text-xs px-3 ${period === "month" && "bg-primary text-white"}`}
                 >
-                    This Month
+                    Month
                 </Button>
                 <Button
                     onClick={() => setPeriod("year")}
                     variant="outline"
-                    className={`h-8 ${period === "year" && "bg-primary text-white"}`}
+                    className={`h-7 text-xs px-3 ${period === "year" && "bg-primary text-white"}`}
                 >
-                    This Year
+                    Year
                 </Button>
             </div>
 
-            <ResponsiveContainer width="100%" height={290}>
-                <LineChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
+            <ResponsiveContainer width="100%" height={272}>
+                <LineChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
 
                     <XAxis
@@ -94,43 +94,51 @@ const IncomeExpenseBalanceChart = ({ count }: { count: number }) => {
                         tickFormatter={(date) =>
                             new Date(date).toLocaleDateString(undefined, { day: "2-digit", month: "short" })
                         }
-                        padding={{ left: 10, right: 10 }}
+                        padding={{ left: 5, right: 5 }}
+                        tick={{ fontSize: 10 }}
+                        interval="preserveStartEnd"
                     />
 
-                    <YAxis domain={[0, maxValue]} allowDecimals={false} />
+                    <YAxis 
+                        domain={[0, maxValue]} 
+                        allowDecimals={false}
+                        tick={{ fontSize: 10 }}
+                        width={50}
+                    />
 
                     <Tooltip
-                        formatter={(value, name) => [`$${value}`, name]}
-                        labelFormatter={(label) => `Date: ${new Date(label).toLocaleDateString()}`}
+                        formatter={(value, name) => [`$${Number(value).toLocaleString()}`, name]}
+                        labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                        contentStyle={{ fontSize: '12px', padding: '8px' }}
                     />
 
                     {/* Income Line - Green */}
                     <Line
                         type="monotone"
                         dataKey="income"
-                        stroke="#34D399" // Green color
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
-                        name="Total Income"
+                        stroke="#34D399"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                        name="Income"
                     />
 
                     {/* Expense Line - Red */}
                     <Line
                         type="monotone"
                         dataKey="expense"
-                        stroke="#EF4444" // Red color
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
-                        name="Total Expenses"
+                        stroke="#EF4444"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
+                        name="Expenses"
                     />
 
                     {/* Balance Line - Blue */}
                     <Line
                         type="monotone"
                         dataKey="balance"
-                        stroke="#4F46E5" // Blue color
-                        strokeWidth={3}
-                        dot={{ r: 4 }}
+                        stroke="#4F46E5"
+                        strokeWidth={2}
+                        dot={{ r: 3 }}
                         name="Balance"
                     />
                 </LineChart>

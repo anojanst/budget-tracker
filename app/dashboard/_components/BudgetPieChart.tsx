@@ -23,7 +23,21 @@ const COLORS = [
 
 const BudgetPieChart = () => {
     const {user} = useUser()
-  const [data, setData] = useState<{ name: string; totalSpent: number }[]>([]);
+    const [data, setData] = useState<{ name: string; totalSpent: number }[]>([]);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile screen
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768); // md breakpoint
+        };
+        
+        if (typeof window !== 'undefined') {
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            return () => window.removeEventListener('resize', checkMobile);
+        }
+    }, []);
 
   const getBudgetSpending = async (createdBy: string) => {
     // Get budget spending using budgetId directly
@@ -63,8 +77,12 @@ const BudgetPieChart = () => {
       });
     }
 
-    console.log(cleanedData);
-    return cleanedData;
+    // Sort by totalSpent descending (show all categories, but limit display in budget comparison)
+    const sortedData = cleanedData.sort((a, b) => b.totalSpent - a.totalSpent);
+    const displayData = sortedData; // Show all categories in pie chart
+
+    console.log(displayData);
+    return displayData;
   };
 
   useEffect(() => {
@@ -74,20 +92,43 @@ const BudgetPieChart = () => {
     };
 
     user && fetchData();
-  }, [user]);
+  }, [user, isMobile]);
+
+  // Reduced by 15%: height 360 -> 306, outerRadius 150 -> 127.5
+  const chartHeight = 306;
+  const outerRadius = 127.5;
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <PieChart>
-        <Pie data={data} dataKey="totalSpent" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-          {data.map((_, index) => (
-            <Cell key={index} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="w-full">
+      <ResponsiveContainer width="100%" height={chartHeight}>
+        <PieChart>
+          <Pie 
+            data={data} 
+            dataKey="totalSpent" 
+            nameKey="name" 
+            cx="50%" 
+            cy="50%" 
+            outerRadius={outerRadius} 
+            label={isMobile 
+              ? ({ percent }) => `${(percent * 100).toFixed(0)}%`
+              : ({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`
+            }
+            labelLine={false}
+          >
+            {data.map((_, index) => (
+              <Cell key={index} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
+          <Legend 
+            wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+            iconSize={10}
+            layout="horizontal"
+            verticalAlign="bottom"
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
