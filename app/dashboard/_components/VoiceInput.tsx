@@ -404,28 +404,6 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
           </div>
         )}
       </div>
-
-      {/* Transcript Display */}
-      {transcript && (
-        <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm'>
-          <div className='font-semibold text-xs text-blue-700 mb-1'>Transcript:</div>
-          <div className='text-xs text-blue-600'>{transcript}</div>
-        </div>
-      )}
-
-      {/* Parsed Data Display */}
-      {parsedData && (parsedData.name || parsedData.amount || parsedData.date) && (
-        <div className='mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm'>
-          <div className='font-semibold text-xs text-green-700 mb-1'>Parsed Data:</div>
-          <div className='text-xs text-green-600 space-y-1'>
-            {parsedData.name && <div>Name: {parsedData.name}</div>}
-            {parsedData.amount && <div>Amount: ${parsedData.amount}</div>}
-            {parsedData.date && <div>Date: {parsedData.date}</div>}
-            {parsedData.tag && <div>Tag: {parsedData.tag}</div>}
-            {parsedData.category && <div>Category: {parsedData.category}</div>}
-          </div>
-        </div>
-      )}
       
       {/* Error Display */}
       {error && (
