@@ -101,53 +101,71 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
 
     return (
         <div>
-            <div>
-                <h2 className='font-semibold'>Add New Budget</h2>
-            </div>
-            <div className='p-2 border rounded-lg mt-1'>
-                <div className='mb-2'>
+            <div className='space-y-3'>
+                <div>
                     <VoiceInput 
                         type='expense' 
                         onTranscript={() => {}} 
                         onParse={handleVoiceParse}
                     />
                 </div>
-                <div className='grid grid-cols-2 gap-2'>
-                    <div className=' col-span-1'>
-                        <Input placeholder='Title - Eg: Groceries' value={name!} className='h-8' onChange={(e) => setName(e.target.value)} />
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Title - Eg: Groceries' 
+                            value={name!} 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setName(e.target.value)} 
+                        />
                     </div>
-                    <div className=' col-span-1'>
-                        <Input placeholder='Amount - Eg: 100' value={amount!} type='number' className='h-8' min={0} onChange={(e) => setAmount(parseInt(e.target.value))} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Amount - Eg: 100' 
+                            value={amount!} 
+                            type='number' 
+                            className='h-9 md:h-10' 
+                            min={0} 
+                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                        />
                     </div>
-                    <div className=' col-span-1'>
-                    <Input placeholder='date' value={date!} type='date' className='h-8' min={0} onChange={(e) => setDate(e.target.value)} />
-                        
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Date' 
+                            value={date!} 
+                            type='date' 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setDate(e.target.value)} 
+                        />
                     </div>
-                    <div className=' col-span-1'>
+                    <div className='md:col-span-1'>
                         <Select onValueChange={(value) => setTagId(parseInt(value))} value={tagId? tagId.toString() : ""}>
-                            <SelectTrigger className="w-full h-8">
-                                <SelectValue placeholder="Select a Tag" />
+                            <SelectTrigger className="w-full h-9 md:h-10">
+                                <SelectValue placeholder="Select a Tag (Optional)" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    {tags && tags.map((tag, index) => (
-                                        <SelectItem key={index} value={tag.id.toString()}>{tag.name}</SelectItem>
-                                    ))}
+                                    {tags && tags.length > 0 ? (
+                                        tags.map((tag, index) => (
+                                            <SelectItem key={index} value={tag.id.toString()}>{tag.name}</SelectItem>
+                                        ))
+                                    ) : (
+                                        <div className="px-2 py-1.5 text-sm text-muted-foreground text-center">
+                                            No tags available
+                                        </div>
+                                    )}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className='mt-1 col-span-2'>
-
-                        <Button
-                            disabled={!(name && amount && date)}
-                            onClick={() => saveExpense()}
-                            className='w-full h-8'>Save Expense</Button>
-                    </div>
-
                 </div>
+                <Button
+                    disabled={!(name && amount && date)}
+                    onClick={() => saveExpense()}
+                    className='w-full h-9 md:h-10'
+                >
+                    Save Expense
+                </Button>
             </div>
-
         </div>
     )
 }

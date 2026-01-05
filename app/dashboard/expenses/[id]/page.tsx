@@ -6,15 +6,12 @@ import { db } from '@/utils/dbConfig'
 import { useUser } from '@clerk/nextjs'
 import { useParams } from 'next/navigation'
 import { Budget, Expense, Tag } from '../../_type/type'
-import BudgetItem from '../../budgets/_components/BudgetItem'
 import BudgetItemSkeleton from '../../budgets/_components/BudgetItemSkeleton'
 import AddExpenses from './_components/AddExpenses'
-import AddTags from './_components/AddTags'
-import TagItem from './_components/TagItem'
+import TagsSection from './_components/TagsSection'
 import ExpenseItem from './_components/ExpenseItem'
+import BudgetSummary from './_components/BudgetSummary'
 import { Skeleton } from '@/components/ui/skeleton'
-import DeleteBudget from './_components/DeteleBudget'
-import EditBudget from './_components/EditBudget'
 
 function ExpensesPage() {
   const params = useParams()
@@ -130,41 +127,59 @@ function ExpensesPage() {
   }
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8'>
-      <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-lg'>{budget?.name}</h1>
-        <div className='flex gap-2'>
-          <EditBudget budget={budget!} refreshData={() => fetchData()} />
-          <DeleteBudget budgetId={budget?.id!} />
+    <div className='w-full px-2 py-3 pb-6 md:px-4 md:py-4 lg:px-6 lg:py-6 max-w-7xl mx-auto'>
+      {/* Budget Summary and Add Expense - Mobile: stacked, Desktop: side by side */}
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6 items-stretch'>
+        {/* Budget Summary */}
+        <div className='flex'>
+          {budget ? (
+            <div className='w-full'>
+              <BudgetSummary budget={budget} refreshData={() => fetchData()} />
+            </div>
+          ) : (
+            <BudgetItemSkeleton />
+          )}
         </div>
-      </div>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 mt-2'>
-        <div className='col-span-1 lg:col-span-2 grid'>
-          <div>
-            <h2 className='font-semibold lg:-mb-3'>Summary</h2>
-          </div>
-          {budget ? <BudgetItem budget={budget} /> : <BudgetItemSkeleton />}
 
-        </div>
-        <div className='col-span-1 lg:col-span-3'>
-          {budget ? <AddExpenses refreshData={() => fetchData()} tags={tags ? tags : []} budgetId={budgetId} /> : <Skeleton className='h-40 w-full' />}
-        </div>
-        <div className='col-span-1 lg:col-span-2'>
-          {budget ? <AddTags refreshData={() => fetchData()} budgetId={budget?.id!} /> : <Skeleton className='h-40 w-full' />}
+        {/* Add Expense */}
+        <div className='flex'>
+          {budget ? (
+            <div className='border rounded-lg p-3 md:p-4 bg-card w-full flex flex-col'>
+              <AddExpenses refreshData={() => fetchData()} tags={tags ? tags : []} budgetId={budgetId} />
+            </div>
+          ) : (
+            <Skeleton className='h-full w-full' />
+          )}
         </div>
       </div>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-5 mt-7'>
-        <div className='col-span-1 lg:col-span-5 border rounded-lg p-2'>
-          <h2 className='font-semibold'>Latest Expenses</h2>
-          {expenses.length > 0 ? expenses.map((expense, index) => (
-            <ExpenseItem key={index} expense={expense} refreshData={() => fetchData()} />
-          )) : <Skeleton className='h-10 w-full' />}
+
+      {/* Expenses and Tags - Mobile: stacked (expenses first, tags last), Desktop: side by side */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
+        {/* Expenses List */}
+        <div className='lg:col-span-2 order-1 lg:order-1'>
+          <div className='border rounded-lg p-3 md:p-4 bg-card'>
+            <h2 className='font-semibold text-base md:text-lg mb-3 md:mb-4'>Expenses</h2>
+            {expenses.length > 0 ? (
+              <div className='space-y-2'>
+                {expenses.map((expense, index) => (
+                  <ExpenseItem key={index} expense={expense} refreshData={() => fetchData()} />
+                ))}
+              </div>
+            ) : (
+              <div className='text-center py-8 text-muted-foreground text-sm'>
+                <p>No expenses yet. Add your first expense above!</p>
+              </div>
+            )}
+          </div>
         </div>
-        <div className='col-span-1 lg:col-span-2 border rounded-lg p-2'>
-          <h1 className='font-semibold'>Tag List</h1>
-          {tags ? tags.map((tag, index) => (
-            <TagItem key={index} tag={tag} />
-          )) : <Skeleton className='h-10 w-full' />}
+
+        {/* Tags Section - Mobile: last (order-2), Desktop: sidebar (order-2) */}
+        <div className='lg:col-span-1 order-2 lg:order-2'>
+          {budget ? (
+            <TagsSection refreshData={() => fetchData()} budgetId={budget.id} tags={tags} />
+          ) : (
+            <Skeleton className='h-40 w-full' />
+          )}
         </div>
       </div>
     </div>

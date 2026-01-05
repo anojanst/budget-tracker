@@ -22,50 +22,61 @@ function ExpenseItem(props: { expense: Expense, refreshData: () => void }) {
         toast(`Expense has been deleted.`)
     }
 
+    const formattedAmount = typeof expense.amount === "number"
+        ? `$${expense.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : `$${expense.amount}.00`
+
     return (
-        <div className="grid grid-cols-12 items-center gap-x-3 gap-y-1 rounded-xl bg-slate-100 p-3 my-1">
-            {/* Date — mobile top-left, desktop center column */}
-            <div className="col-span-7 text-sm text-muted-foreground md:order-3 md:col-span-2 md:text-center">
-                {expense.date}
+        <div className="flex items-center gap-3 rounded-lg bg-slate-50 border border-slate-200 p-3 hover:bg-slate-100 transition-colors">
+            {/* Expense Name - Takes most space */}
+            <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm md:text-base truncate" title={expense.name}>
+                    {expense.name}
+                </div>
+                {/* Mobile: Show date and tag below name */}
+                <div className="flex items-center gap-2 mt-1 md:hidden">
+                    <span className="text-xs text-muted-foreground">{expense.date}</span>
+                    {expense.tagName ? (
+                        <Badge className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5">
+                            {expense.tagName}
+                        </Badge>
+                    ) : (
+                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-1.5 py-0.5">
+                            No Tag
+                        </Badge>
+                    )}
+                </div>
             </div>
 
-            {/* Tag — mobile top-right */}
-            <div className="col-span-3 justify-self-end md:order-4 md:col-span-2 md:text-center">
+            {/* Amount - Always visible, prominent */}
+            <div className="font-semibold text-sm md:text-base tabular-nums text-right whitespace-nowrap">
+                {formattedAmount}
+            </div>
+
+            {/* Desktop: Date and Tag */}
+            <div className="hidden md:flex md:items-center md:gap-2">
+                <span className="text-xs text-muted-foreground whitespace-nowrap">{expense.date}</span>
                 {expense.tagName ? (
-                    <Badge className="bg-primary text-primary-foreground font-medium px-2 py-0.5 text-xs whitespace-nowrap">
+                    <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5 whitespace-nowrap">
                         {expense.tagName}
                     </Badge>
                 ) : (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 font-medium px-2 py-0.5 text-xs whitespace-nowrap">
+                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-2 py-0.5 whitespace-nowrap">
                         No Tag
                     </Badge>
                 )}
             </div>
 
-            {/* Delete — mobile next to tag (far right) */}
-            <div className="col-span-2 flex justify-end md:order-5 md:col-span-1">
-                <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-7 w-12"
-                    aria-label={`Delete ${expense.name}`}
-                    onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
-                >
-                    <Trash className="h-3.5 w-3.5" />
-                </Button>
-            </div>
-
-            {/* Name — mobile second line left, desktop first */}
-            <div className="col-span-7 truncate md:order-1 md:col-span-5" title={expense.name}>
-                {expense.name}
-            </div>
-
-            {/* Amount — mobile second line right, desktop second */}
-            <div className="col-span-5 text-right font-semibold tabular-nums md:order-2 md:col-span-2">
-                {typeof expense.amount === "number"
-                    ? `$${expense.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                    : `$${expense.amount}.00`}
-            </div>
+            {/* Delete Button */}
+            <Button
+                size="icon"
+                variant="ghost"
+                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                aria-label={`Delete ${expense.name}`}
+                onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
+            >
+                <Trash className="h-4 w-4" />
+            </Button>
         </div>
     )
 }

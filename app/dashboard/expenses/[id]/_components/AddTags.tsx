@@ -28,21 +28,21 @@ function AddTags(props: { refreshData: () => void, budgetId: number }) {
 
     return (
         <div>
-            <div>
-                <h2 className='font-semibold'>Add New Tag</h2>
-            </div>
-            <div className='p-2 border rounded-lg mt-1 h-[133px] flex flex-col justify-between'>
-                    <div>
-                        <Input value={name} placeholder='Tag Name - Eg: Groceries' className='h-8' onChange={(e) => setName(e.target.value)} />
-                    </div>
-                    <div className='mt-2'>
-                        <Button
-                            disabled={!(name)}
-                            onClick={() => addTag()}
-                            className='w-full h-8'>
-                            Add Tags
-                        </Button>
-                    </div>
+            <h2 className='font-semibold text-sm md:text-base mb-3'>Add Tag</h2>
+            <div className='space-y-3'>
+                <Input 
+                    value={name} 
+                    placeholder='Tag Name - Eg: Groceries' 
+                    className='h-9 md:h-10' 
+                    onChange={(e) => setName(e.target.value)} 
+                />
+                <Button
+                    disabled={!name}
+                    onClick={() => addTag()}
+                    className='w-full h-9 md:h-10'
+                >
+                    Add Tag
+                </Button>
             </div>
         </div>
     )
