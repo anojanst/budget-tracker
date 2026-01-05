@@ -56,9 +56,9 @@ function AddIncome(props: { refreshData: () => void }) {
 
     return (
         <div>
-            <div className='p-3 border rounded-lg'>
-                <div className='flex items-center justify-between mb-4'>
-                    <h2 className='font-semibold'>Add New Income</h2>
+            <h2 className='font-semibold text-sm md:text-base mb-3'>Add Income</h2>
+            <div className='space-y-3'>
+                <div>
                     <VoiceInput 
                         type='income' 
                         onTranscript={() => {}} 
@@ -66,22 +66,36 @@ function AddIncome(props: { refreshData: () => void }) {
                     />
                 </div>
                 <div className='grid grid-cols-1 gap-2'>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold'>Source Name</h1>
-                        <Input placeholder='Source - Eg: Salary' value={name} className='h-8' onChange={(e) => setName(e.target.value)} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Source - Eg: Salary' 
+                            value={name} 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setName(e.target.value)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold'>Amount</h1>
-                        <Input placeholder='Amount - Eg: 1000' value={amount} type='number' className='h-8' min={0} onChange={(e) => setAmount(parseInt(e.target.value))} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Amount - Eg: 1000' 
+                            value={amount} 
+                            type='number' 
+                            className='h-9 md:h-10' 
+                            min={0} 
+                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold'>Date</h1>
-                        <Input placeholder='date' value={date} type='date' className='h-8' onChange={(e) => setDate(e.target.value)} />
+                    <div className='md:col-span-1'>
+                        <Input 
+                            placeholder='Date' 
+                            value={date} 
+                            type='date' 
+                            className='h-9 md:h-10' 
+                            onChange={(e) => setDate(e.target.value)} 
+                        />
                     </div>
-                    <div className='col-span-1'>
-                        <h1 className='text-sm font-semibold'>Category</h1>
+                    <div className='md:col-span-1'>
                         <Select value={category} onValueChange={setCategory}>
-                            <SelectTrigger className="h-8">
+                            <SelectTrigger className="h-9 md:h-10">
                                 <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
@@ -93,13 +107,14 @@ function AddIncome(props: { refreshData: () => void }) {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className='mt-1 col-span-1'>
-                        <Button
-                            disabled={!(name && amount && date && category)}
-                            onClick={saveIncome}
-                            className='w-full h-8'>Save Income</Button>
-                    </div>
                 </div>
+                <Button
+                    disabled={!(name && amount && date && category)}
+                    onClick={saveIncome}
+                    className='w-full h-9 md:h-10'
+                >
+                    Save Income
+                </Button>
             </div>
         </div>
     );

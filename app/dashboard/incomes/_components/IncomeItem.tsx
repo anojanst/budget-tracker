@@ -22,47 +22,83 @@ function IncomeItem(props: { income: Income, refreshData: () => void }) {
             toast(`Income has been deleted.`)
         }
     }
+    const formattedAmount = typeof income.amount === "number"
+        ? `$${income.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+        : `$${income.amount}.00`
+
     return (
-        <div className="grid grid-cols-12 items-center gap-x-3 gap-y-1 rounded-xl bg-slate-100 p-3 my-1">
-            {/* Date — mobile top-left, desktop center-ish */}
-            <div className="col-span-6 text-xs text-muted-foreground md:order-4 md:col-span-2 md:text-center">
-                {income.date}
+        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 md:p-4 hover:bg-slate-100 transition-colors">
+            {/* Mobile Layout */}
+            <div className="flex flex-col gap-2 md:hidden">
+                <div className="flex items-center justify-between gap-2">
+                    <div className="font-medium text-sm truncate flex-1" title={income.name}>
+                        {income.name}
+                    </div>
+                    <div className="font-semibold text-sm tabular-nums whitespace-nowrap">
+                        {formattedAmount}
+                    </div>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{income.date}</span>
+                        <Badge className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5">
+                            {income.category}
+                        </Badge>
+                    </div>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                        aria-label={`Delete ${income.name}`}
+                        onClick={() => deleteIncome(income.id, income.date, income.amount)}
+                    >
+                        <Trash className="h-3.5 w-3.5" />
+                    </Button>
+                </div>
             </div>
 
-            {/* Category — mobile top-right */}
-            <div className="col-span-4 justify-self-end md:order-3 md:col-span-2 md:justify-self-center">
-                {/* If you use shadcn Badge, keep this; otherwise swap for a <span> */}
-                <Badge className="bg-primary/90 text-primary-foreground font-medium px-2 py-0.5 text-xs whitespace-nowrap">
-                    {income.category}
-                </Badge>
-            </div>
+            {/* Desktop Layout - Table-like with proper column alignment */}
+            <div className="hidden md:grid md:grid-cols-12 md:items-center md:gap-4">
+                {/* Name - 5 columns */}
+                <div className="col-span-5 min-w-0">
+                    <div className="font-medium text-base truncate" title={income.name}>
+                        {income.name}
+                    </div>
+                </div>
 
-            {/* Delete — to the right of category on mobile */}
-            <div className="col-span-2 flex justify-end md:order-5 md:col-span-1">
-                <Button
-                    size="icon"
-                    variant="destructive"
-                    className="h-7 w-12"
-                    aria-label={`Delete ${income.name}`}
-                    onClick={() => deleteIncome(income.id, income.date, income.amount)}
-                >
-                    <Trash className="h-3.5 w-3.5" />
-                </Button>
-            </div>
+                {/* Amount - 2 columns, right-aligned */}
+                <div className="col-span-2 text-right">
+                    <div className="font-semibold text-base tabular-nums whitespace-nowrap">
+                        {formattedAmount}
+                    </div>
+                </div>
 
-            {/* Name — second line left on mobile; first column on desktop */}
-            <div className="col-span-7 truncate md:order-1 md:col-span-5" title={income.name}>
-                {income.name}
-            </div>
+                {/* Date - 2 columns */}
+                <div className="col-span-2">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">{income.date}</span>
+                </div>
 
-            {/* Amount — second line right on mobile; second column on desktop */}
-            <div className="col-span-5 text-right font-semibold tabular-nums md:order-2 md:col-span-2">
-                {typeof income.amount === "number"
-                    ? `$${income.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                    : `$${income.amount}.00`}
+                {/* Category - 2 columns */}
+                <div className="col-span-2">
+                    <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5 whitespace-nowrap">
+                        {income.category}
+                    </Badge>
+                </div>
+
+                {/* Delete Button - 1 column */}
+                <div className="col-span-1 flex justify-end">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        aria-label={`Delete ${income.name}`}
+                        onClick={() => deleteIncome(income.id, income.date, income.amount)}
+                    >
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </div>
-
     )
 }
 
