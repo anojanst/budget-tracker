@@ -10,23 +10,26 @@ import { set } from 'date-fns';
 
 const AddExtraPayment = ({ loanId, refreshData }: { loanId: number; refreshData: () => void }) => {
   const { user } = useUser();
-  const [extraAmount, setExtraAmount] = useState<number>(0);
-  const [fee, setFee] = useState<number>(0);
+  const [extraAmount, setExtraAmount] = useState<string>('');
+  const [fee, setFee] = useState<string>('');
   const [paymentDate, setPaymentDate] = useState<string>(new Date().toISOString().split("T")[0]);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    if (extraAmount <= 0) {
+    const extraAmountNum = parseFloat(extraAmount) || 0;
+    const feeNum = parseFloat(fee) || 0;
+    
+    if (extraAmountNum <= 0) {
       toast.error("Enter a valid extra payment amount");
       return;
     }
 
     setLoading(true);
 
-    await addExtraLoanPayment(loanId, user?.primaryEmailAddress?.emailAddress!, extraAmount, fee, paymentDate);
+    await addExtraLoanPayment(loanId, user?.primaryEmailAddress?.emailAddress!, extraAmountNum, feeNum, paymentDate);
 
-    setExtraAmount(0);
-    setFee(0);
+    setExtraAmount('');
+    setFee('');
     refreshData();
     setPaymentDate(new Date().toISOString().split("T")[0]);
     setLoading(false);
@@ -39,11 +42,11 @@ const AddExtraPayment = ({ loanId, refreshData }: { loanId: number; refreshData:
         <div className="grid grid-cols-4 gap-4">
           <div className='col-span-1'>
             <h3 className="text-sm font-semibold mb-1">Payment Amount</h3>
-            <Input type="number" value={extraAmount} onChange={(e) => setExtraAmount(parseFloat(e.target.value) || 0)} />
+            <Input type="number" value={extraAmount} onChange={(e) => setExtraAmount(e.target.value)} />
           </div>
           <div className='col-span-1'>
             <h3 className="text-sm font-semibold mb-1">Processing Fee</h3>
-            <Input type="number" value={fee} onChange={(e) => setFee(parseFloat(e.target.value) || 0)} />
+            <Input type="number" value={fee} onChange={(e) => setFee(e.target.value)} />
           </div>
           <div className='col-span-1'>
             <h3 className="text-sm font-semibold mb-1">Payment Date</h3>

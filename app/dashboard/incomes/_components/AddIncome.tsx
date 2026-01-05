@@ -15,7 +15,7 @@ function AddIncome(props: { refreshData: () => void }) {
     const { refreshData } = props;
     const { user } = useUser();
     const [name, setName] = useState('');
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState<string>('');
     const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
     const [category, setCategory] = useState<string>("Salary"); // Default category
 
@@ -24,7 +24,7 @@ function AddIncome(props: { refreshData: () => void }) {
             setName(parsed.name)
         }
         if (parsed.amount) {
-            setAmount(parsed.amount)
+            setAmount(parsed.amount.toString())
         }
         if (parsed.date) {
             setDate(parsed.date)
@@ -35,20 +35,21 @@ function AddIncome(props: { refreshData: () => void }) {
     }
 
     const saveIncome = async () => {
+        const amountNum = parseFloat(amount) || 0;
         const result = await db.insert(Incomes).values({
             name: name,
-            amount: amount,
+            amount: amountNum,
             createdBy: user?.primaryEmailAddress?.emailAddress!,
             date: date,
             category: category as typeof incomeCategoryEnum.enumValues[number]
         }).returning({ insertedId: Incomes.id });
 
         if (result) {
-            recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amount, "income", "add");
+            recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amountNum, "income", "add");
             refreshData();
             toast(`Income has been added.`);
             setName('');
-            setAmount(0);
+            setAmount('');
             setDate(format(new Date(), 'yyyy-MM-dd'));
             setCategory("Salary");
         }
@@ -81,7 +82,7 @@ function AddIncome(props: { refreshData: () => void }) {
                             type='number' 
                             className='h-9 md:h-10' 
                             min={0} 
-                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                            onChange={(e) => setAmount(e.target.value)} 
                         />
                     </div>
                     <div className='md:col-span-1'>
@@ -109,7 +110,7 @@ function AddIncome(props: { refreshData: () => void }) {
                     </div>
                 </div>
                 <Button
-                    disabled={!(name && amount && date && category)}
+                    disabled={!(name && amount && parseFloat(amount) > 0 && date && category)}
                     onClick={saveIncome}
                     className='w-full h-9 md:h-10'
                 >

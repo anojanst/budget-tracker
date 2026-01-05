@@ -15,21 +15,25 @@ function AddLoan(props: { refreshData: () => void }) {
     const { user } = useUser();
     
     const [lender, setLender] = useState('');
-    const [amount, setAmount] = useState(0);
-    const [interestRate, setInterestRate] = useState(0);
-    const [tenure, setTenure] = useState(12); // Default: 12 months
+    const [amount, setAmount] = useState<string>('');
+    const [interestRate, setInterestRate] = useState<string>('');
+    const [tenure, setTenure] = useState<string>('12'); // Default: 12 months
     const [repaymentFrequency, setRepaymentFrequency] = useState<string>("monthly");
     const [nextDueDate, setNextDueDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
 
     const saveLoan = async () => {
         if (!user?.primaryEmailAddress?.emailAddress) return;
 
+        const amountNum = parseFloat(amount) || 0;
+        const interestRateNum = parseFloat(interestRate) || 0;
+        const tenureNum = parseInt(tenure) || 12;
+
         await addLoanWithRepayments(
             user.primaryEmailAddress.emailAddress,
             lender,
-            amount,
-            interestRate,
-            tenure,
+            amountNum,
+            interestRateNum,
+            tenureNum,
             repaymentFrequency as "monthly" | "bimonthly" | "weekly",
             nextDueDate
         );
@@ -39,9 +43,9 @@ function AddLoan(props: { refreshData: () => void }) {
         
         // Reset fields
         setLender('');
-        setAmount(0);
-        setInterestRate(0);
-        setTenure(12);
+        setAmount('');
+        setInterestRate('');
+        setTenure('12');
         setRepaymentFrequency("monthly");
         setNextDueDate(format(new Date(), 'yyyy-MM-dd'));
     };
@@ -66,7 +70,7 @@ function AddLoan(props: { refreshData: () => void }) {
                             type='number' 
                             className='h-9 md:h-10' 
                             min={0} 
-                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                            onChange={(e) => setAmount(e.target.value)} 
                         />
                     </div>
                     <div className='md:col-span-1'>
@@ -77,7 +81,7 @@ function AddLoan(props: { refreshData: () => void }) {
                             className='h-9 md:h-10' 
                             min={0} 
                             step="0.1" 
-                            onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)} 
+                            onChange={(e) => setInterestRate(e.target.value)} 
                         />
                     </div>
                     <div className='md:col-span-1'>
@@ -87,7 +91,7 @@ function AddLoan(props: { refreshData: () => void }) {
                             type='number' 
                             className='h-9 md:h-10' 
                             min={1} 
-                            onChange={(e) => setTenure(parseInt(e.target.value) || 12)} 
+                            onChange={(e) => setTenure(e.target.value)} 
                         />
                     </div>
                     <div className='md:col-span-1'>
@@ -113,7 +117,7 @@ function AddLoan(props: { refreshData: () => void }) {
                     </div>
                 </div>
                 <Button
-                    disabled={!(lender && amount && interestRate && tenure && nextDueDate && repaymentFrequency)}
+                    disabled={!(lender && amount && parseFloat(amount) > 0 && interestRate && parseFloat(interestRate) >= 0 && tenure && parseInt(tenure) > 0 && nextDueDate && repaymentFrequency)}
                     onClick={saveLoan}
                     className='w-full h-9 md:h-10'
                 >

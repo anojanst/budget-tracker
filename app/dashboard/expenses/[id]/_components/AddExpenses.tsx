@@ -22,7 +22,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
     const { user } = useUser()
     const [name, setName] = useState('')
     const [date, setDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
-    const [amount, setAmount] = useState(0)
+    const [amount, setAmount] = useState<string>('')
     const [tagId, setTagId] = useState<number | null>(null)
 
     const handleVoiceParse = (parsed: ParsedVoiceData) => {
@@ -32,7 +32,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
             setName(parsed.name)
         }
         if (parsed.amount) {
-            setAmount(parsed.amount)
+            setAmount(parsed.amount.toString())
         }
         if (parsed.date) {
             setDate(parsed.date)
@@ -64,9 +64,10 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
     }
 
     const saveExpense = async () => {
-        console.log('Saving expense with data:', { name, amount, date, tagId, createdBy: user?.primaryEmailAddress?.emailAddress })
+        const amountNum = parseFloat(amount) || 0;
+        console.log('Saving expense with data:', { name, amount: amountNum, date, tagId, createdBy: user?.primaryEmailAddress?.emailAddress })
         
-        if (!name || !amount || !date) {
+        if (!name || !amount || amountNum <= 0 || !date) {
             console.error('Missing required fields:', { name, amount, date })
             toast.error('Please fill in name, amount, and date')
             return
@@ -75,7 +76,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
         try {
             const result = await db.insert(Expenses).values({
                 name: name,
-                amount: amount,
+                amount: amountNum,
                 createdBy: user?.primaryEmailAddress?.emailAddress!,
                 date: date,
                 budgetId: budgetId,
@@ -85,10 +86,10 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
             console.log('Expense saved successfully:', result)
 
             if (result) {
-                recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amount, "expense", "add");
+                recalcBalanceHistoryFromDate(user?.primaryEmailAddress?.emailAddress!, date, amountNum, "expense", "add");
                 refreshData()
                 toast(`Expense has been created.`)
-                setAmount(0)
+                setAmount('')
                 setName('')
                 setDate(format(new Date(), 'yyyy-MM-dd'))
                 setTagId(null)
@@ -121,11 +122,11 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
                     <div className='md:col-span-1'>
                         <Input 
                             placeholder='Amount - Eg: 100' 
-                            value={amount!} 
+                            value={amount} 
                             type='number' 
                             className='h-9 md:h-10' 
                             min={0} 
-                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)} 
+                            onChange={(e) => setAmount(e.target.value)} 
                         />
                     </div>
                     <div className='md:col-span-1'>
@@ -159,7 +160,7 @@ function AddExpenses(props: { refreshData: () => void, tags: Tag[], budgetId: nu
                     </div>
                 </div>
                 <Button
-                    disabled={!(name && amount && date)}
+                    disabled={!(name && amount && parseFloat(amount) > 0 && date)}
                     onClick={() => saveExpense()}
                     className='w-full h-9 md:h-10'
                 >
