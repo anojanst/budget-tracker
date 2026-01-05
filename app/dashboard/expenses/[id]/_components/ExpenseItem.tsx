@@ -27,56 +27,89 @@ function ExpenseItem(props: { expense: Expense, refreshData: () => void }) {
         : `$${expense.amount}.00`
 
     return (
-        <div className="flex items-center gap-3 rounded-lg bg-slate-50 border border-slate-200 p-3 hover:bg-slate-100 transition-colors">
-            {/* Expense Name - Takes most space */}
-            <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm md:text-base truncate" title={expense.name}>
-                    {expense.name}
+        <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 md:p-4 hover:bg-slate-100 transition-colors mb-1">
+            {/* Mobile Layout */}
+            <div className="flex flex-col gap-2 md:hidden">
+                <div className="flex items-center justify-between gap-2">
+                    <div className="font-medium text-sm truncate flex-1" title={expense.name}>
+                        {expense.name}
+                    </div>
+                    <div className="font-semibold text-sm tabular-nums whitespace-nowrap">
+                        {formattedAmount}
+                    </div>
                 </div>
-                {/* Mobile: Show date and tag below name */}
-                <div className="flex items-center gap-2 mt-1 md:hidden">
-                    <span className="text-xs text-muted-foreground">{expense.date}</span>
+                <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{expense.date}</span>
+                        {expense.tagName ? (
+                            <Badge className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5">
+                                {expense.tagName}
+                            </Badge>
+                        ) : (
+                            <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-1.5 py-0.5">
+                                No Tag
+                            </Badge>
+                        )}
+                    </div>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
+                        aria-label={`Delete ${expense.name}`}
+                        onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
+                    >
+                        <Trash className="h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            </div>
+
+            {/* Desktop Layout - Table-like with proper column alignment */}
+            <div className="hidden md:grid md:grid-cols-12 md:items-center md:gap-4">
+                {/* Name - 5 columns */}
+                <div className="col-span-5 min-w-0">
+                    <div className="font-medium text-base truncate" title={expense.name}>
+                        {expense.name}
+                    </div>
+                </div>
+
+                {/* Amount - 2 columns, right-aligned */}
+                <div className="col-span-2 text-right">
+                    <div className="font-semibold text-base tabular-nums whitespace-nowrap">
+                        {formattedAmount}
+                    </div>
+                </div>
+
+                {/* Date - 2 columns */}
+                <div className="col-span-2">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">{expense.date}</span>
+                </div>
+
+                {/* Tag - 2 columns */}
+                <div className="col-span-2">
                     {expense.tagName ? (
-                        <Badge className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5">
+                        <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5 whitespace-nowrap">
                             {expense.tagName}
                         </Badge>
                     ) : (
-                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-1.5 py-0.5">
+                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-2 py-0.5 whitespace-nowrap">
                             No Tag
                         </Badge>
                     )}
                 </div>
-            </div>
 
-            {/* Amount - Always visible, prominent */}
-            <div className="font-semibold text-sm md:text-base tabular-nums text-right whitespace-nowrap">
-                {formattedAmount}
+                {/* Delete Button - 1 column */}
+                <div className="col-span-1 flex justify-end">
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        aria-label={`Delete ${expense.name}`}
+                        onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
+                    >
+                        <Trash className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
-
-            {/* Desktop: Date and Tag */}
-            <div className="hidden md:flex md:items-center md:gap-2">
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{expense.date}</span>
-                {expense.tagName ? (
-                    <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5 whitespace-nowrap">
-                        {expense.tagName}
-                    </Badge>
-                ) : (
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300 text-xs px-2 py-0.5 whitespace-nowrap">
-                        No Tag
-                    </Badge>
-                )}
-            </div>
-
-            {/* Delete Button */}
-            <Button
-                size="icon"
-                variant="ghost"
-                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 flex-shrink-0"
-                aria-label={`Delete ${expense.name}`}
-                onClick={() => triggerDelete(expense.id, expense.date, expense.amount)}
-            >
-                <Trash className="h-4 w-4" />
-            </Button>
         </div>
     )
 }
