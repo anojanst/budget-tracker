@@ -33,6 +33,11 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
       return
     }
 
+    // Detect mobile browser
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+
     // Check if browser supports Speech Recognition
     const SpeechRecognition = 
       (window as any).SpeechRecognition || 
@@ -46,10 +51,25 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         return
       }
 
+      // iOS Safari has limited support - show warning
+      if (isIOS && isSafari) {
+        console.warn('iOS Safari has limited Web Speech API support. Consider using Chrome on iOS for better results.')
+      }
+
       setIsSupported(true)
       const recognition = new SpeechRecognition()
-      recognition.continuous = false
-      recognition.interimResults = false
+      
+      // Mobile browsers may need different settings
+      if (isMobile) {
+        recognition.continuous = false
+        recognition.interimResults = false
+        // Some mobile browsers work better with shorter timeouts
+        recognition.maxAlternatives = 1
+      } else {
+        recognition.continuous = false
+        recognition.interimResults = false
+      }
+      
       recognition.lang = 'en-US'
 
       recognition.onstart = () => {
@@ -61,20 +81,24 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
       }
 
       recognition.onresult = (event: SpeechRecognitionEvent) => {
-        const transcriptText = event.results[0][0].transcript
-        setTranscript(transcriptText)
-        setError(null)
-        onTranscript(transcriptText)
-        
-        // Parse the transcript
-        const parsed = parseVoiceInput(transcriptText, type)
-        setParsedData(parsed)
-        
-        if (onParse) {
-          onParse(parsed)
+        if (event.results && event.results.length > 0 && event.results[0].length > 0) {
+          const transcriptText = event.results[0][0].transcript
+          setTranscript(transcriptText)
+          setError(null)
+          onTranscript(transcriptText)
+          
+          // Parse the transcript
+          const parsed = parseVoiceInput(transcriptText, type)
+          setParsedData(parsed)
+          
+          if (onParse) {
+            onParse(parsed)
+          }
+          
+          toast.success('Voice input captured!')
+        } else {
+          toast.error('No speech detected. Please try again.')
         }
-        
-        toast.success('Voice input captured!')
       }
 
       recognition.onerror = (event: any) => {
@@ -86,12 +110,24 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         if (event.error === 'no-speech') {
           toast.error('No speech detected. Please try again.')
         } else if (event.error === 'not-allowed') {
-          const msg = 'Microphone permission denied. Please click the microphone icon in your browser\'s address bar and allow access, or check your browser settings.'
+          const msg = isMobile 
+            ? 'Microphone permission denied. Please:\n1. Go to your browser settings\n2. Allow microphone access for this site\n3. Refresh and try again'
+            : 'Microphone permission denied. Please click the microphone icon in your browser\'s address bar and allow access, or check your browser settings.'
           setError(msg)
-          toast.error(msg, { duration: 5000 })
+          toast.error(msg, { duration: 6000 })
         } else if (event.error === 'aborted') {
           // User stopped it, no need to show error
           setError(null)
+        } else if (event.error === 'network') {
+          const msg = 'Network error. Please check your internet connection and try again.'
+          setError(msg)
+          toast.error(msg)
+        } else if (event.error === 'service-not-allowed') {
+          const msg = isMobile
+            ? 'Speech recognition service not available. Please try using Chrome browser on mobile for better support.'
+            : 'Speech recognition service not available. Please try again.'
+          setError(msg)
+          toast.error(msg, { duration: 5000 })
         } else {
           toast.error(`Speech recognition error: ${event.error}. Please try again.`)
         }
@@ -104,44 +140,74 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
       recognitionRef.current = recognition
     } else {
       setIsSupported(false)
+      if (isMobile) {
+        console.warn('Web Speech API not supported on this mobile browser. Try Chrome or Edge on mobile.')
+      }
     }
 
     return () => {
       if (recognitionRef.current) {
-        recognitionRef.current.stop()
+        try {
+          recognitionRef.current.stop()
+        } catch (e) {
+          // Ignore errors when stopping
+        }
       }
     }
   }, [onTranscript, onParse, type])
 
   const startListening = async () => {
-    if (typeof window === 'undefined' || !navigator.mediaDevices) {
+    if (typeof window === 'undefined') {
       const msg = 'Voice input is not available in this environment.'
       setError(msg)
       toast.error(msg)
       return
     }
 
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
     if (recognitionRef.current && !isListening) {
       try {
         setError(null)
-        // Request microphone permission first
-        try {
-          await navigator.mediaDevices.getUserMedia({ audio: true })
-        } catch (permissionError: any) {
-          const errorMsg = `Permission Error: ${permissionError.name} - ${permissionError.message || 'Microphone access denied'}`
-          setError(errorMsg)
-          
-          if (permissionError.name === 'NotAllowedError' || permissionError.name === 'PermissionDeniedError') {
-            const msg = 'Microphone permission is required. Please:\n1. Click the lock/microphone icon in your browser address bar\n2. Allow microphone access\n3. Refresh the page and try again'
-            setError(msg)
-            toast.error(msg, { duration: 6000 })
-            return
-          } else if (permissionError.name === 'NotFoundError') {
-            const msg = 'No microphone found. Please connect a microphone and try again.'
-            setError(msg)
-            toast.error(msg)
-            return
+        
+        // Request microphone permission first (especially important for mobile)
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            // On mobile, this is crucial for getting permissions
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+            // Stop the stream immediately - we just needed permission
+            stream.getTracks().forEach(track => track.stop())
+          } catch (permissionError: any) {
+            const errorMsg = `Permission Error: ${permissionError.name} - ${permissionError.message || 'Microphone access denied'}`
+            setError(errorMsg)
+            
+            if (permissionError.name === 'NotAllowedError' || permissionError.name === 'PermissionDeniedError') {
+              const msg = isMobile
+                ? 'Microphone permission is required. Please:\n1. Tap the lock/microphone icon in your browser address bar\n2. Allow microphone access\n3. Refresh the page and try again\n\nNote: On iOS Safari, voice input may have limited support. Try Chrome on mobile for better results.'
+                : 'Microphone permission is required. Please:\n1. Click the lock/microphone icon in your browser address bar\n2. Allow microphone access\n3. Refresh the page and try again'
+              setError(msg)
+              toast.error(msg, { duration: 7000 })
+              return
+            } else if (permissionError.name === 'NotFoundError') {
+              const msg = 'No microphone found. Please connect a microphone and try again.'
+              setError(msg)
+              toast.error(msg)
+              return
+            } else if (permissionError.name === 'NotReadableError' || permissionError.name === 'TrackStartError') {
+              const msg = 'Microphone is being used by another application. Please close other apps using the microphone and try again.'
+              setError(msg)
+              toast.error(msg, { duration: 5000 })
+              return
+            }
           }
+        } else {
+          // Fallback for browsers without getUserMedia
+          console.warn('getUserMedia not available, proceeding without explicit permission check')
+        }
+
+        // Small delay for mobile browsers to ensure permissions are set
+        if (isMobile) {
+          await new Promise(resolve => setTimeout(resolve, 100))
         }
 
         recognitionRef.current.start()
@@ -151,11 +217,19 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         setError(errorMsg)
         
         if (error.name === 'NotAllowedError' || error.message?.includes('not-allowed')) {
-          const msg = 'Microphone permission denied. Please allow microphone access in your browser settings and try again.'
+          const msg = isMobile
+            ? 'Microphone permission denied. Please allow microphone access in your browser settings and try again. On iOS, try using Chrome for better support.'
+            : 'Microphone permission denied. Please allow microphone access in your browser settings and try again.'
           setError(msg)
-          toast.error(msg, { duration: 5000 })
+          toast.error(msg, { duration: 6000 })
+        } else if (error.message?.includes('already started')) {
+          // Recognition already started, just update state
+          setIsListening(true)
         } else {
-          toast.error('Failed to start voice recognition. Please try again.')
+          const msg = isMobile
+            ? 'Failed to start voice recognition. On mobile, try using Chrome browser for better support.'
+            : 'Failed to start voice recognition. Please try again.'
+          toast.error(msg, { duration: 5000 })
         }
       }
     }
@@ -278,9 +352,20 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
   }
 
   if (!isSupported) {
+    const isMobile = typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
     return (
       <div className='text-xs text-muted-foreground'>
-        Voice input not supported in this browser. Please use Chrome, Edge, or Safari.
+        Voice input not supported in this browser. 
+        {isMobile ? (
+          <div className='mt-1'>
+            Please use <strong>Chrome</strong> or <strong>Edge</strong> on mobile for best results.
+            <div className='mt-1 text-amber-600'>
+              Note: iOS Safari has limited Web Speech API support.
+            </div>
+          </div>
+        ) : (
+          <div className='mt-1'>Please use Chrome, Edge, or Safari.</div>
+        )}
         {typeof window !== 'undefined' && !window.isSecureContext && window.location.hostname !== 'localhost' && (
           <div className='mt-1 text-red-500'>
             Note: Voice input requires HTTPS connection.
@@ -320,6 +405,27 @@ function VoiceInput({ onTranscript, onParse, type }: VoiceInputProps) {
         )}
       </div>
 
+      {/* Transcript Display */}
+      {transcript && (
+        <div className='mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm'>
+          <div className='font-semibold text-xs text-blue-700 mb-1'>Transcript:</div>
+          <div className='text-xs text-blue-600'>{transcript}</div>
+        </div>
+      )}
+
+      {/* Parsed Data Display */}
+      {parsedData && (parsedData.name || parsedData.amount || parsedData.date) && (
+        <div className='mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm'>
+          <div className='font-semibold text-xs text-green-700 mb-1'>Parsed Data:</div>
+          <div className='text-xs text-green-600 space-y-1'>
+            {parsedData.name && <div>Name: {parsedData.name}</div>}
+            {parsedData.amount && <div>Amount: ${parsedData.amount}</div>}
+            {parsedData.date && <div>Date: {parsedData.date}</div>}
+            {parsedData.tag && <div>Tag: {parsedData.tag}</div>}
+            {parsedData.category && <div>Category: {parsedData.category}</div>}
+          </div>
+        </div>
+      )}
       
       {/* Error Display */}
       {error && (
