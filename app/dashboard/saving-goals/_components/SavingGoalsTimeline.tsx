@@ -1,6 +1,5 @@
 'use client'
 import React, { useMemo } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { SavingGoalWithContributions } from '../../_type/type'
 import { format, differenceInDays, isPast, isToday } from 'date-fns'
@@ -57,29 +56,63 @@ function SavingGoalsTimeline({ goals }: { goals: SavingGoalWithContributions[] }
   const overallTotalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0)
 
   return (
-    <Card className='mb-6'>
-      <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
-          <Target className='h-5 w-5' />
-          Saving Goals Timeline - Total Overview
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className='border rounded-lg p-3 md:p-4 bg-card mb-4 md:mb-6'>
+      {/* Header */}
+      <div className='flex items-center gap-2 mb-4'>
+        <Target className='h-4 w-4 md:h-5 md:w-5 text-muted-foreground' />
+        <h2 className='font-bold text-base md:text-lg'>Saving Goals Timeline - Total Overview</h2>
+      </div>
+
+      <div>
+        {/* Overall Summary */}
+        <div className='mb-4 md:mb-6 pb-4 border-b'>
+          <div className='flex items-center justify-between gap-2 md:gap-4 mb-4'>
+            <div className='text-center flex-1'>
+              <div className='text-base md:text-2xl font-bold text-red-600'>
+                ${overallTotalNeeded.toLocaleString()}
+              </div>
+              <div className='text-xs text-muted-foreground'>Total Still Needed</div>
+            </div>
+            <div className='text-center flex-1'>
+              <div className='text-base md:text-2xl font-bold text-green-600'>
+                ${overallTotalSaved.toLocaleString()}
+              </div>
+              <div className='text-xs text-muted-foreground'>Total Saved</div>
+            </div>
+            <div className='text-center flex-1'>
+              <div className='text-base md:text-2xl font-bold text-blue-600'>
+                ${overallTotalTarget.toLocaleString()}
+              </div>
+              <div className='text-xs text-muted-foreground'>Total Target</div>
+            </div>
+          </div>
+          <div className='w-full bg-slate-200 rounded-full h-2 md:h-3'>
+            <div
+              className='bg-green-500 h-2 md:h-3 rounded-full transition-all'
+              style={{ width: `${Math.min((overallTotalSaved / overallTotalTarget) * 100, 100)}%` }}
+            />
+          </div>
+          <div className='text-center mt-2 text-xs md:text-sm text-muted-foreground'>
+            Overall Progress: {((overallTotalSaved / overallTotalTarget) * 100).toFixed(1)}%
+          </div>
+        </div>
+
+        {/* Timeline Accordion */}
         <Accordion type='single' collapsible className='w-full'>
           <AccordionItem value='timeline' className='border-none'>
             <AccordionTrigger className='py-2 hover:no-underline'>
               <span className='text-sm font-medium text-muted-foreground'>View Timeline</span>
             </AccordionTrigger>
             <AccordionContent>
-              {/* Horizontal Timeline */}
-              <div className='relative pb-8'>
-                {/* Timeline line */}
-                <div className='absolute top-3 left-0 right-0 h-0.5 bg-slate-300 z-0' />
+              {/* Horizontal Timeline with Scroll */}
+              <div className='relative pb-8 overflow-x-auto'>
+                {/* Timeline line - spans full width of scrollable content */}
+                <div className='absolute top-3 left-0 h-0.5 bg-slate-300 z-0' style={{ width: `${Math.max(600, timelineData.length * 150)}px` }} />
                 
-                {/* Timeline markers - distributed across full width */}
-                <div className='relative flex justify-between items-start'>
+                {/* Timeline markers - distributed across full width with horizontal scroll */}
+                <div className='relative flex items-start' style={{ width: `${Math.max(600, timelineData.length * 150)}px` }}>
                   {timelineData.map((item, index) => (
-                    <div key={item.date} className='flex flex-col items-center relative flex-1' style={{ maxWidth: '100%' }}>
+                    <div key={item.date} className='flex flex-col items-center relative' style={{ width: `${100 / timelineData.length}%`, minWidth: '150px' }}>
                       {/* Timeline marker */}
                       <div className='relative z-10 flex flex-col items-center w-full px-2'>
                         <div
@@ -122,41 +155,8 @@ function SavingGoalsTimeline({ goals }: { goals: SavingGoalWithContributions[] }
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-
-        {/* Overall Summary */}
-        <div className='mt-6 pt-4 border-t'>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-4'>
-            <div className='text-center'>
-              <div className='text-2xl font-bold text-red-600'>
-                ${overallTotalNeeded.toLocaleString()}
-              </div>
-              <div className='text-sm text-muted-foreground'>Total Still Needed</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-2xl font-bold text-green-600'>
-                ${overallTotalSaved.toLocaleString()}
-              </div>
-              <div className='text-sm text-muted-foreground'>Total Saved</div>
-            </div>
-            <div className='text-center'>
-              <div className='text-2xl font-bold text-blue-600'>
-                ${overallTotalTarget.toLocaleString()}
-              </div>
-              <div className='text-sm text-muted-foreground'>Total Target</div>
-            </div>
-          </div>
-          <div className='w-full bg-slate-200 rounded-full h-3'>
-            <div
-              className='bg-green-500 h-3 rounded-full transition-all'
-              style={{ width: `${Math.min((overallTotalSaved / overallTotalTarget) * 100, 100)}%` }}
-            />
-          </div>
-          <div className='text-center mt-2 text-sm text-muted-foreground'>
-            Overall Progress: {((overallTotalSaved / overallTotalTarget) * 100).toFixed(1)}%
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
 

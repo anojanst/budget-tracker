@@ -62,22 +62,23 @@ function SavingGoalsPage() {
   }
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8'>
-      <div className='flex justify-between pb-3 border-b-2 border-b-slate-100'>
-        <h1 className='font-bold text-xl'>Saving Goals</h1>
+    <div className='w-full px-2 py-3 pb-6 md:px-4 md:py-4 lg:px-6 lg:py-6 max-w-7xl mx-auto'>
+      {/* Header */}
+      <div className='flex flex-col gap-3 mb-4 md:flex-row md:items-center md:justify-between md:mb-6'>
+        <h1 className='font-bold text-lg md:text-xl'>Saving Goals</h1>
         <CreateSavingGoal refreshData={fetchGoals} />
       </div>
 
       {loading ? (
-        <div className='mt-6'>Loading...</div>
+        <div className='text-center text-muted-foreground py-8'>Loading...</div>
       ) : goals.length === 0 ? (
-        <div className='mt-6 text-center text-muted-foreground'>
-          <p>No saving goals yet. Create one to get started!</p>
+        <div className='border rounded-lg p-6 md:p-8 bg-card text-center text-muted-foreground'>
+          <p className='text-sm md:text-base'>No saving goals yet. Create one to get started!</p>
         </div>
       ) : (
         <>
           <SavingGoalsTimeline goals={goals} />
-          <div className='mt-6 space-y-4'>
+          <div className='mt-4 md:mt-6 space-y-4'>
             {goals.map((goal) => (
               <SavingGoalList
                 key={goal.id}
