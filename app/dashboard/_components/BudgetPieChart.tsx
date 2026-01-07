@@ -102,7 +102,7 @@ const BudgetPieChart = () => {
   return (
     <div className="w-full">
       <ResponsiveContainer width="100%" height={chartHeight}>
-        <PieChart margin={{ top: 30, right: 10, bottom: 30, left: 10 }}>
+        <PieChart margin={{ top: 50, right: 10, bottom: 30, left: 10 }}>
           <Pie 
             data={data} 
             dataKey="totalSpent" 
