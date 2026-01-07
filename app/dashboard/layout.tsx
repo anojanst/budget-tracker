@@ -30,6 +30,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import MobileBottomNav from "./_components/MobileBottomNav";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
@@ -141,10 +142,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
         </aside>
 
         {/* Main content - mobile-first, with margin on desktop for sidebar */}
-        <main className="w-full md:ml-0">
+        <main className="w-full md:ml-0 pb-20 md:pb-0">
           {children}
         </main>
       </div>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }

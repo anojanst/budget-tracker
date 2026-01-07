@@ -95,19 +95,20 @@ const BudgetPieChart = () => {
   }, [user, isMobile]);
 
   // Reduced by 15%: height 360 -> 306, outerRadius 150 -> 127.5
+  // Adjusted to prevent collision with legends
   const chartHeight = 306;
-  const outerRadius = 127.5;
+  const outerRadius = isMobile ? 100 : 110; // Smaller radius to leave space for labels and legend
 
   return (
     <div className="w-full">
       <ResponsiveContainer width="100%" height={chartHeight}>
-        <PieChart>
+        <PieChart margin={{ top: 10, right: 10, bottom: 60, left: 10 }}>
           <Pie 
             data={data} 
             dataKey="totalSpent" 
             nameKey="name" 
             cx="50%" 
-            cy="50%" 
+            cy={isMobile ? "45%" : "40%"} 
             outerRadius={outerRadius} 
             label={isMobile 
               ? ({ percent }) => `${(percent * 100).toFixed(0)}%`
@@ -121,10 +122,11 @@ const BudgetPieChart = () => {
           </Pie>
           <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
           <Legend 
-            wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+            wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }}
             iconSize={10}
             layout="horizontal"
             verticalAlign="bottom"
+            align="center"
           />
         </PieChart>
       </ResponsiveContainer>
