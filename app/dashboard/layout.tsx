@@ -79,7 +79,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background">
       {/* Top bar (mobile + desktop) */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
         <div className="flex h-12 md:h-14 items-center justify-between px-3 md:px-4 lg:px-6">
           <Link href="/dashboard" className="flex items-center" aria-label="Dashboard home">
             <Image
@@ -101,7 +101,13 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       <div className="w-full flex">
         {/* Desktop Sidebar - hidden on mobile, visible on md+ */}
-        <aside className="hidden md:block md:sticky md:top-14 md:h-[calc(100dvh-3.5rem)] md:w-64 md:shrink-0 md:border-r md:bg-background md:p-4 lg:p-6">
+        <aside 
+          className="hidden md:block md:sticky md:w-64 md:shrink-0 md:border-r md:bg-background md:p-4 lg:p-6" 
+          style={{ 
+            top: 'calc(3.5rem + env(safe-area-inset-top))',
+            height: 'calc(100dvh - 3.5rem - env(safe-area-inset-top))'
+          }}
+        >
           <nav className="mt-2 space-y-1 overflow-y-auto pr-1">
             {menuList.map((item) => (
               <Link key={item.id} href={item.path}>
