@@ -17,7 +17,7 @@ export default function MobileBottomNav() {
 
   return (
     <nav 
-      className="fixed bottom-0 left-0 right-0 z-50 border-t-2 border-border bg-background shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)] md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t-2 border-border bg-background shadow-[0_-8px_16px_rgba(0,0,0,0.12)] md:hidden"
       style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="grid grid-cols-4 h-16">
